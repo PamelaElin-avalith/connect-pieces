@@ -1,73 +1,186 @@
-# Welcome to your Lovable project
+# PuzzleConnect 🧩
 
-## Project info
+**Conecta. Encuentra. Crece.**
 
-**URL**: https://lovable.dev/projects/79808fbc-4db1-4655-9880-a8dfdc48142c
+PuzzleConnect es una plataforma moderna que conecta developers y empresas como piezas de rompecabezas perfectas. Encuentra tu match ideal en el mundo tech con una experiencia minimalista y eficiente.
 
-## How can I edit this code?
+## ✨ Características
 
-There are several ways of editing your application.
+- **🔍 Match Inteligente**: Algoritmo que conecta talento con oportunidades basado en skills y cultura
+- **👥 Perfiles Verificados**: Developers verificados con proyectos reales en GitHub
+- **🏢 Para Empresas**: Registro y gestión de perfiles corporativos
+- **🌙 Dark Mode**: Tema oscuro/claro con transiciones suaves
+- **📱 Responsive**: Diseño adaptativo para desktop, tablet y mobile
+- **🎨 Diseño Puzzle**: Estética inspirada en piezas de rompecabezas encastradas
 
-**Use Lovable**
+## 🛠️ Stack Tecnológico
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/79808fbc-4db1-4655-9880-a8dfdc48142c) and start prompting.
+### Frontend
+- **React 18** - Biblioteca de interfaz de usuario
+- **Vite** - Build tool y servidor de desarrollo
+- **TypeScript** - Tipado estático
+- **Tailwind CSS** - Framework de estilos
+- **Lucide React** - Iconografía
+- **React Router Dom** - Enrutamiento
+- **Radix UI** - Componentes accesibles primitivos
 
-Changes made via Lovable will be committed automatically to this repo.
+### UI/UX
+- **Shadcn/ui** - Sistema de componentes
+- **Class Variance Authority** - Gestión de variantes de estilos
+- **Tailwind Animate** - Animaciones
 
-**Use your preferred IDE**
+### Funcionalidades
+- **React Hook Form** - Gestión de formularios
+- **TanStack Query** - Gestión de estado del servidor
+- **Zod** - Validación de esquemas
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend (Ready for Integration)
+- **Supabase** - Backend as a Service (BAAS)
+  - Autenticación de usuarios
+  - Base de datos PostgreSQL
+  - Almacenamiento de archivos
+  - APIs en tiempo real
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🚀 Instalación y Configuración
 
-Follow these steps:
+### Prerrequisitos
+- Node.js 16+ 
+- npm, yarn o bun
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Ejecutar en desarrollo
+```bash
 npm run dev
+# o
+yarn dev
+# o
+bun dev
 ```
 
-**Edit a file directly in GitHub**
+La aplicación estará disponible en `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Build para producción
+```bash
+npm run build
+# o
+yarn build
+# o
+bun run build
+```
 
-**Use GitHub Codespaces**
+## 🗂️ Estructura del Proyecto
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+src/
+├── components/
+│   ├── layout/
+│   │   └── Header.tsx          # Cabecera principal
+│   └── ui/                     # Componentes base (Shadcn/ui)
+│       ├── puzzle-card.tsx     # Componente card temático
+│       └── theme-provider.tsx  # Proveedor de temas
+├── pages/
+│   ├── auth/
+│   │   ├── Login.tsx          # Página de inicio de sesión
+│   │   └── Register.tsx       # Página de registro
+│   ├── Home.tsx               # Página principal
+│   └── Index.tsx              # Ruta principal
+├── lib/
+│   └── utils.ts               # Utilidades
+├── hooks/                     # Hooks personalizados
+├── index.css                  # Estilos globales y tokens de diseño
+└── main.tsx                   # Punto de entrada
+```
 
-## What technologies are used for this project?
+## 🎨 Sistema de Diseño
 
-This project is built with:
+### Colores Principales
+- **Primary**: Azul profundo para conexiones fuertes
+- **Secondary**: Púrpura complementario para variedad
+- **Accent**: Naranja cálido para CTAs y highlights
+- **Puzzle Connection**: Verde para estados de conexión
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Tokens de Diseño
+El sistema usa tokens semánticos definidos en `src/index.css`:
+- Gradientes para profundidad y sensación de conexión
+- Sombras específicas para elevación de piezas de puzzle
+- Animaciones de pulso para elementos de conexión
 
-## How can I deploy this project?
+## 🔗 Integración con Supabase
 
-Simply open [Lovable](https://lovable.dev/projects/79808fbc-4db1-4655-9880-a8dfdc48142c) and click on Share -> Publish.
+### ¿Por qué Supabase?
 
-## Can I connect a custom domain to my Lovable project?
+**Justificación técnica:**
+1. **Open Source**: Alternativa open source a Firebase
+2. **PostgreSQL**: Base de datos relacional robusta y escalable
+3. **Real-time**: Subscripciones en tiempo real out-of-the-box
+4. **Row Level Security**: Seguridad granular a nivel de fila
+5. **Auto-generación de APIs**: REST y GraphQL automáticas
+6. **Storage**: Almacenamiento de archivos con CDN global
+7. **Edge Functions**: Funciones serverless en el edge
 
-Yes, you can!
+### Configuración (Próximos pasos)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. **Conectar Supabase**
+   - Hacer clic en el botón verde "Supabase" en la interfaz de Lovable
+   - Seguir el proceso de configuración
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+2. **Esquema de base de datos** (se configurará automáticamente)
+   ```sql
+   -- Tabla de usuarios developers
+   CREATE TABLE developers (
+     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+     email TEXT UNIQUE NOT NULL,
+     name TEXT NOT NULL,
+     skills TEXT[],
+     github_url TEXT,
+     linkedin_url TEXT,
+     cv_url TEXT,
+     avatar_url TEXT,
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+
+   -- Tabla de empresas
+   CREATE TABLE companies (
+     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+     email TEXT UNIQUE NOT NULL,
+     name TEXT NOT NULL,
+     sector TEXT,
+     description TEXT,
+     logo_url TEXT,
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+   ```
+
+## 🚀 Deploy
+
+### Opción 1: Deploy con Lovable (Recomendado)
+1. Abrir el proyecto en [Lovable](https://lovable.dev/projects/79808fbc-4db1-4655-9880-a8dfdc48142c)
+2. Hacer clic en "Share" → "Publish"
+3. La aplicación se desplegará automáticamente
+
+### Opción 2: Deploy manual en Vercel
+```bash
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+```
+
+## 📋 Próximos Pasos
+
+### Para activar funcionalidades completas:
+1. **Conectar Supabase**: Hacer clic en el botón verde "Supabase" en Lovable
+2. **Configurar autenticación**: Email/Password authentication
+3. **Configurar Storage**: Para CVs, avatares y logos
+4. **Implementar funcionalidades**: Perfiles, matching, etc.
+
+## 🤝 Contribuir
+
+Para modificar este proyecto:
+- **Usar Lovable**: Visitar el [proyecto en Lovable](https://lovable.dev/projects/79808fbc-4db1-4655-9880-a8dfdc48142c)
+- **Git**: Clonar repo, hacer cambios y push
+- **GitHub Codespaces**: Editar directamente en el navegador
+
+---
+
+**PuzzleConnect** - Conectando talento con oportunidades, una pieza a la vez. 🧩
