@@ -11,29 +11,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Tipos para TypeScript (opcional pero recomendado)
 export type Database = {
-  // Aquí puedes definir los tipos de tu base de datos
-  // Ejemplo:
-  // public: {
-  //   Tables: {
-  //     users: {
-  //       Row: {
-  //         id: string
-  //         email: string
-  //         created_at: string
-  //       }
-  //       Insert: {
-  //         id?: string
-  //         email: string
-  //         created_at?: string
-  //       }
-  //       Update: {
-  //         id?: string
-  //         email?: string
-  //         created_at?: string
-  //       }
-  //     }
-  //   }
-  // }
+  public: {
+    Tables: Record<string, never>
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+  }
 }
 
 // Cliente tipado (opcional)
