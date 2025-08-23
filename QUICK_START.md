@@ -28,7 +28,7 @@ VITE_SUPABASE_ANON_KEY=tu_clave_anonima
 ### **4. Ejecutar Esquema SQL**
 
 1. Ve a **SQL Editor** en Supabase
-2. Copia y ejecuta el contenido de `database/simple-schema.sql`
+2. Copia y ejecuta el contenido de `supabase/schema.sql`
 
 ## 🗄️ **Esquema Simplificado**
 
@@ -221,9 +221,25 @@ async function createDeveloper() {
 
 ## 🔗 **Archivos Importantes**
 
-- `database/simple-schema.sql` - Esquema simplificado
+- `supabase/schema.sql` - Esquema principal de la base de datos
+- `supabase/README.md` - Documentación completa del esquema
 - `src/lib/supabaseClient.ts` - Cliente de Supabase
 - `src/lib/test-connection.ts` - Funciones de prueba
 - `.env.local` - Variables de entorno (crear manualmente)
 
-¡Con esto deberías poder empezar rápidamente con Supabase!
+## 📁 **Nueva Estructura del Proyecto**
+
+```
+connect-pieces/
+├── supabase/                    # 🆕 Carpeta principal de Supabase
+│   ├── README.md               # Documentación del esquema
+│   ├── schema.sql              # Esquema principal de la BD
+│   └── config.toml             # Configuración de Supabase
+├── src/
+│   └── lib/
+│       ├── supabaseClient.ts   # Cliente principal
+│       └── test-connection.ts  # Funciones de prueba
+└── .env.local                  # Variables de entorno
+```
+
+¡Con esta nueva estructura organizada podrás empezar rápidamente con Supabase!
