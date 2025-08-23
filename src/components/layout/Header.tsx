@@ -1,15 +1,40 @@
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PuzzleIcon, Moon, Sun, User, Building, LogOut } from "lucide-react";
+import {
+  PuzzleIcon,
+  Moon,
+  Sun,
+  User,
+  Building,
+  LogOut,
+  Menu,
+  X,
+  Home,
+  Users,
+  Briefcase,
+  UserCircle,
+} from "lucide-react";
 import { useTheme } from "@/components/ui/theme-provider";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export const Header = () => {
   const { theme, setTheme } = useTheme();
-  const { userType, setUserType, isAuthenticated, setIsAuthenticated } =
-    useNavigation();
+  const {
+    userType,
+    setUserType,
+    isAuthenticated,
+    setIsAuthenticated,
+    activeTab,
+    setActiveTab,
+    showAuthModal,
+    setShowAuthModal,
+    setAuthMode,
+  } = useNavigation();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -18,152 +43,292 @@ export const Header = () => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserType(null);
+    setActiveTab("home");
     navigate("/");
+    setMobileMenuOpen(false);
   };
 
   const handleUserTypeSelect = (type: "developer" | "company") => {
     setUserType(type);
-    // Navegar a la página correspondiente según el tipo de usuario
-    if (type === "developer") {
-      navigate("/developers");
-    } else {
-      navigate("/companies");
-    }
+    setActiveTab(type === "developer" ? "developers" : "companies");
+    navigate(type === "developer" ? "/developers" : "/companies");
+    setMobileMenuOpen(false);
   };
 
-  const handleLogoClick = () => {
-    navigate("/");
+  const handleAuthClick = (mode: "login" | "register") => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+    setMobileMenuOpen(false);
   };
 
-  const handleDevelopersClick = () => {
-    navigate("/developers");
-  };
+  const navigationItems = [
+    { id: "home", label: "Inicio", icon: Home, path: "/" },
+    { id: "developers", label: "Developers", icon: Users, path: "/developers" },
+    { id: "companies", label: "Empresas", icon: Building, path: "/companies" },
+    { id: "projects", label: "Proyectos", icon: Briefcase, path: "/projects" },
+  ];
 
-  const handleCompaniesClick = () => {
-    navigate("/companies");
-  };
-
-  const handleProjectsClick = () => {
-    navigate("/projects");
-  };
-
-  const handleLoginClick = () => {
-    navigate("/login");
+  const isActiveTab = (tabId: string) => {
+    if (tabId === "home") return location.pathname === "/";
+    return location.pathname === `/${tabId}`;
   };
 
   return (
-    <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div
-          className="flex items-center gap-3 cursor-pointer"
-          onClick={handleLogoClick}
-        >
-          <div className="relative">
-            <PuzzleIcon className="h-8 w-8 text-primary" />
-            <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-accent"></div>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">PuzzleConnect</h1>
-            <p className="text-xs text-muted-foreground">Conectando talento</p>
-          </div>
-        </div>
+    <>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex h-14 sm:h-16 items-center justify-between">
+            {/* Logo */}
+            <div
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer transition-opacity hover:opacity-80"
+              onClick={() => {
+                navigate("/");
+                setActiveTab("home");
+                setMobileMenuOpen(false);
+              }}
+            >
+              <div className="relative">
+                <PuzzleIcon className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                  PuzzleConnect
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  Conectando talento
+                </p>
+              </div>
+            </div>
 
-        {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Button
-            variant={location.pathname === "/developers" ? "default" : "ghost"}
-            className="text-muted-foreground hover:text-foreground"
-            onClick={handleDevelopersClick}
-          >
-            Explorar Developers
-          </Button>
-          <Button
-            variant={location.pathname === "/companies" ? "default" : "ghost"}
-            className="text-muted-foreground hover:text-foreground"
-            onClick={handleCompaniesClick}
-          >
-            Para Empresas
-          </Button>
-          <Button
-            variant={location.pathname === "/projects" ? "default" : "ghost"}
-            className="text-muted-foreground hover:text-foreground"
-            onClick={handleProjectsClick}
-          >
-            Proyectos
-          </Button>
-        </nav>
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navigationItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={isActiveTab(item.id) ? "default" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "transition-all duration-200",
+                    isActiveTab(item.id)
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "hover:bg-muted hover:text-foreground"
+                  )}
+                  onClick={() => {
+                    navigate(item.path);
+                    setActiveTab(item.id as any);
+                  }}
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </Button>
+              ))}
+            </nav>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="rounded-full"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
-
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2">
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-3">
+              {/* Theme Toggle */}
               <Button
-                variant={userType === "developer" ? "default" : "outline"}
-                className="hidden sm:flex items-center gap-2"
-                onClick={() => handleUserTypeSelect("developer")}
-              >
-                <User className="h-4 w-4" />
-                Developer
-              </Button>
-              <Button
-                variant={userType === "company" ? "default" : "outline"}
-                className="hidden sm:flex items-center gap-2"
-                onClick={() => handleUserTypeSelect("company")}
-              >
-                <Building className="h-4 w-4" />
-                Empresa
-              </Button>
-              <Button
-                variant="outline"
+                variant="ghost"
                 size="icon"
-                onClick={handleLogout}
-                className="rounded-full"
+                onClick={toggleTheme}
+                className="rounded-full hover:bg-muted"
               >
-                <LogOut className="h-4 w-4" />
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
+
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  {/* User Type Selector */}
+                  <div className="flex rounded-lg border bg-muted p-1">
+                    <Button
+                      variant={userType === "developer" ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 px-3"
+                      onClick={() => handleUserTypeSelect("developer")}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Developer
+                    </Button>
+                    <Button
+                      variant={userType === "company" ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 px-3"
+                      onClick={() => handleUserTypeSelect("company")}
+                    >
+                      <Building className="h-4 w-4 mr-2" />
+                      Empresa
+                    </Button>
+                  </div>
+
+                  {/* Profile & Logout */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigate("/profile");
+                      setActiveTab("profile");
+                    }}
+                  >
+                    <UserCircle className="h-4 w-4 mr-2" />
+                    Perfil
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleLogout}
+                    className="rounded-full hover:bg-muted"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleAuthClick("login")}
+                  >
+                    Iniciar Sesión
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handleAuthClick("register")}
+                    className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                  >
+                    Registrarse
+                  </Button>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="hidden sm:flex items-center gap-2"
-                onClick={() => handleUserTypeSelect("developer")}
-              >
-                <User className="h-4 w-4" />
-                Developer
-              </Button>
-              <Button
-                variant="outline"
-                className="hidden sm:flex items-center gap-2"
-                onClick={() => handleUserTypeSelect("company")}
-              >
-                <Building className="h-4 w-4" />
-                Empresa
-              </Button>
-              <Button
-                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-                onClick={handleLoginClick}
-              >
-                Iniciar Sesión
-              </Button>
-            </div>
-          )}
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         </div>
-      </div>
-    </header>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t bg-background/95 backdrop-blur">
+            <div className="container mx-auto px-3 sm:px-4 py-4 space-y-3">
+              {/* Mobile Navigation Items */}
+              {navigationItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={isActiveTab(item.id) ? "default" : "ghost"}
+                  className="w-full justify-start h-12"
+                  onClick={() => {
+                    navigate(item.path);
+                    setActiveTab(item.id as any);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <item.icon className="h-4 w-4 mr-3" />
+                  {item.label}
+                </Button>
+              ))}
+
+              {/* Mobile Actions */}
+              <div className="pt-4 border-t space-y-3">
+                {isAuthenticated ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant={
+                          userType === "developer" ? "default" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => handleUserTypeSelect("developer")}
+                        className="h-11"
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        Developer
+                      </Button>
+                      <Button
+                        variant={userType === "company" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleUserTypeSelect("company")}
+                        className="h-11"
+                      >
+                        <Building className="h-4 w-4 mr-2" />
+                        Empresa
+                      </Button>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full h-11"
+                      onClick={() => {
+                        navigate("/profile");
+                        setActiveTab("profile");
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <UserCircle className="h-4 w-4 mr-2" />
+                      Mi Perfil
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full h-11 text-destructive hover:text-destructive"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Cerrar Sesión
+                    </Button>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleAuthClick("login")}
+                      className="h-11"
+                    >
+                      Iniciar Sesión
+                    </Button>
+                    <Button
+                      onClick={() => handleAuthClick("register")}
+                      className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 h-11"
+                    >
+                      Registrarse
+                    </Button>
+                  </div>
+                )}
+
+                {/* Mobile Theme Toggle */}
+                <div className="pt-2 border-t">
+                  <Button
+                    variant="ghost"
+                    className="w-full h-11 justify-start"
+                    onClick={toggleTheme}
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="h-4 w-4 mr-3" />
+                    ) : (
+                      <Moon className="h-4 w-4 mr-3" />
+                    )}
+                    {theme === "dark" ? "Modo Claro" : "Modo Oscuro"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 };

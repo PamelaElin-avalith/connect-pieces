@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Tabla de Developers
 CREATE TABLE developers (
-  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  id uuid PRIMARY KEY,
   name text NOT NULL,
   email text UNIQUE NOT NULL,
   skills text[] DEFAULT '{}',
@@ -18,7 +18,7 @@ CREATE TABLE developers (
 
 -- Tabla de Companies
 CREATE TABLE companies (
-  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  id uuid PRIMARY KEY,
   name text NOT NULL,
   email text UNIQUE NOT NULL,
   sector text NOT NULL,
@@ -29,10 +29,10 @@ CREATE TABLE companies (
 
 -- Tabla de Projects
 CREATE TABLE projects (
-  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   description text,
-  company_id bigint REFERENCES companies(id) ON DELETE CASCADE,
+  company_id uuid REFERENCES companies(id) ON DELETE CASCADE,
   skills_required text[] DEFAULT '{}',
   budget_range text,
   project_type text CHECK (project_type IN ('full-time', 'part-time', 'freelance', 'contract')),
@@ -42,9 +42,9 @@ CREATE TABLE projects (
 
 -- Tabla de Connections (conexiones entre developers y companies)
 CREATE TABLE connections (
-  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  developer_id bigint REFERENCES developers(id) ON DELETE CASCADE,
-  company_id bigint REFERENCES companies(id) ON DELETE CASCADE,
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  developer_id uuid REFERENCES developers(id) ON DELETE CASCADE,
+  company_id uuid REFERENCES companies(id) ON DELETE CASCADE,
   status text DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
   message text,
   created_at timestamp with time zone DEFAULT now(),
@@ -53,9 +53,9 @@ CREATE TABLE connections (
 
 -- Tabla de Applications (aplicaciones a proyectos)
 CREATE TABLE applications (
-  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  project_id bigint REFERENCES projects(id) ON DELETE CASCADE,
-  developer_id bigint REFERENCES developers(id) ON DELETE CASCADE,
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id uuid REFERENCES projects(id) ON DELETE CASCADE,
+  developer_id uuid REFERENCES developers(id) ON DELETE CASCADE,
   cover_letter text,
   proposed_rate numeric(10,2),
   status text DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'accepted', 'rejected')),
@@ -63,47 +63,7 @@ CREATE TABLE applications (
   UNIQUE(project_id, developer_id)
 );
 
--- Insertar datos de ejemplo para developers
-INSERT INTO developers (name, email, skills, github, linkedin) VALUES
-  ('Juan Pérez', 'juan@ejemplo.com', ARRAY['React', 'TypeScript', 'Node.js'], 'https://github.com/juanperez', 'https://linkedin.com/in/juanperez'),
-  ('María García', 'maria@ejemplo.com', ARRAY['Python', 'Django', 'PostgreSQL'], 'https://github.com/mariagarcia', 'https://linkedin.com/in/mariagarcia'),
-  ('Carlos López', 'carlos@ejemplo.com', ARRAY['Vue.js', 'JavaScript', 'CSS'], 'https://github.com/carloslopez', 'https://linkedin.com/in/carloslopez'),
-  ('Ana Rodríguez', 'ana@ejemplo.com', ARRAY['React Native', 'Firebase', 'JavaScript'], 'https://github.com/anarodriguez', 'https://linkedin.com/in/anarodriguez'),
-  ('Luis Martínez', 'luis@ejemplo.com', ARRAY['Java', 'Spring Boot', 'MySQL'], 'https://github.com/luismartinez', 'https://linkedin.com/in/luismartinez');
-
--- Insertar datos de ejemplo para companies
-INSERT INTO companies (name, email, sector, description) VALUES
-  ('TechCorp', 'contact@techcorp.com', 'Technology', 'Empresa líder en desarrollo de software y soluciones digitales'),
-  ('Digital Solutions', 'hello@digitalsolutions.com', 'Technology', 'Especialistas en soluciones digitales y transformación tecnológica'),
-  ('Innovation Labs', 'info@innovationlabs.com', 'Research', 'Laboratorio de innovación tecnológica y desarrollo de productos'),
-  ('StartupHub', 'hello@startuphub.com', 'Startup', 'Plataforma para conectar startups con talento tecnológico'),
-  ('Enterprise Solutions', 'contact@enterprisesolutions.com', 'Enterprise', 'Soluciones empresariales a gran escala');
-
--- Insertar datos de ejemplo para projects
-INSERT INTO projects (title, description, company_id, skills_required, budget_range, project_type) VALUES
-  ('App de E-commerce', 'Desarrollo de aplicación móvil para ventas online con sistema de pagos integrado', 1, ARRAY['React Native', 'Node.js', 'Stripe'], '$5000-$10000', 'freelance'),
-  ('Dashboard Analytics', 'Panel de control con métricas empresariales y visualizaciones en tiempo real', 2, ARRAY['Vue.js', 'Python', 'PostgreSQL', 'D3.js'], '$8000-$15000', 'contract'),
-  ('Sistema de Gestión', 'Software para administración de inventarios y control de stock', 3, ARRAY['React', 'TypeScript', 'Node.js', 'MongoDB'], '$12000-$20000', 'full-time'),
-  ('Plataforma de Cursos', 'Sistema LMS para crear y gestionar cursos online', 4, ARRAY['React', 'Node.js', 'PostgreSQL', 'AWS'], '$15000-$25000', 'freelance'),
-  ('API de Microservicios', 'Arquitectura de microservicios para aplicación empresarial', 5, ARRAY['Java', 'Spring Boot', 'Docker', 'Kubernetes'], '$20000-$35000', 'full-time');
-
--- Insertar datos de ejemplo para connections
-INSERT INTO connections (developer_id, company_id, status, message) VALUES
-  (1, 1, 'accepted', 'Me interesa trabajar en proyectos de React y Node.js'),
-  (2, 2, 'pending', 'Tengo experiencia en Python y Django, me gustaría colaborar'),
-  (3, 3, 'accepted', 'Especialista en frontend, disponible para proyectos de Vue.js'),
-  (4, 4, 'pending', 'Desarrolladora móvil con experiencia en React Native'),
-  (5, 5, 'rejected', 'Java developer buscando oportunidades en proyectos empresariales');
-
--- Insertar datos de ejemplo para applications
-INSERT INTO applications (project_id, developer_id, cover_letter, proposed_rate, status) VALUES
-  (1, 1, 'Tengo 3 años de experiencia en React Native y he desarrollado apps similares. Me apasiona crear experiencias de usuario excepcionales.', 7500, 'pending'),
-  (2, 2, 'Especialista en Python y análisis de datos. He trabajado en proyectos de analytics similares y puedo aportar valor inmediato.', 12000, 'reviewed'),
-  (3, 3, 'Frontend developer con experiencia en React y TypeScript. Me gusta crear interfaces intuitivas y responsivas.', 15000, 'accepted'),
-  (4, 4, 'Desarrolladora móvil con experiencia en React Native y Firebase. He creado apps educativas similares.', 18000, 'pending'),
-  (5, 5, 'Java developer senior con experiencia en Spring Boot y arquitecturas de microservicios. He liderado equipos en proyectos similares.', 28000, 'reviewed');
-
--- Habilitar Row Level Security en todas las tablas
+-- Habilitar Row Level Security (RLS)
 ALTER TABLE developers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
@@ -111,158 +71,182 @@ ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
 
 -- Políticas para developers
-CREATE POLICY "public can read developers"
-ON public.developers
-FOR SELECT TO anon
-USING (true);
+CREATE POLICY "developers_select_policy" ON developers
+  FOR SELECT USING (true);
 
-CREATE POLICY "authenticated users can insert developers"
-ON public.developers
-FOR INSERT TO authenticated
-WITH CHECK (true);
+CREATE POLICY "developers_insert_policy" ON developers
+  FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "users can update own developer profile"
-ON public.developers
-FOR UPDATE TO authenticated
-USING (auth.email() = email);
+CREATE POLICY "developers_update_policy" ON developers
+  FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "users can delete own developer profile"
-ON public.developers
-FOR DELETE TO authenticated
-USING (auth.email() = email);
+CREATE POLICY "developers_delete_policy" ON developers
+  FOR DELETE USING (auth.uid() = id);
 
 -- Políticas para companies
-CREATE POLICY "public can read companies"
-ON public.companies
-FOR SELECT TO anon
-USING (true);
+CREATE POLICY "companies_select_policy" ON companies
+  FOR SELECT USING (true);
 
-CREATE POLICY "authenticated users can insert companies"
-ON public.companies
-FOR INSERT TO authenticated
-WITH CHECK (true);
+CREATE POLICY "companies_insert_policy" ON companies
+  FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "users can update own company profile"
-ON public.companies
-FOR UPDATE TO authenticated
-USING (auth.email() = email);
+CREATE POLICY "companies_update_policy" ON companies
+  FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "users can delete own company profile"
-ON public.companies
-FOR DELETE TO authenticated
-USING (auth.email() = email);
+CREATE POLICY "companies_delete_policy" ON companies
+  FOR DELETE USING (auth.uid() = id);
 
 -- Políticas para projects
-CREATE POLICY "public can read projects"
-ON public.projects
-FOR SELECT TO anon
-USING (true);
+CREATE POLICY "projects_select_policy" ON projects
+  FOR SELECT USING (true);
 
-CREATE POLICY "authenticated users can insert projects"
-ON public.projects
-FOR INSERT TO authenticated
-WITH CHECK (true);
+CREATE POLICY "projects_insert_policy" ON projects
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM companies 
+      WHERE companies.id = projects.company_id 
+      AND companies.id = auth.uid()
+    )
+  );
 
-CREATE POLICY "companies can update own projects"
-ON public.projects
-FOR UPDATE TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM companies 
-  WHERE companies.id = projects.company_id 
-  AND companies.email = auth.email()
-));
+CREATE POLICY "projects_update_policy" ON projects
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM companies 
+      WHERE companies.id = projects.company_id 
+      AND companies.id = auth.uid()
+    )
+  );
 
-CREATE POLICY "companies can delete own projects"
-ON public.projects
-FOR DELETE TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM companies 
-  WHERE companies.id = projects.company_id 
-  AND companies.email = auth.email()
-));
+CREATE POLICY "projects_delete_policy" ON projects
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM companies 
+      WHERE companies.id = projects.company_id 
+      AND companies.id = auth.uid()
+    )
+  );
 
 -- Políticas para connections
-CREATE POLICY "users can view connections they're involved in"
-ON public.connections
-FOR SELECT TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM developers WHERE developers.id = connections.developer_id AND developers.email = auth.email()
-  ) OR
-  EXISTS (
-    SELECT 1 FROM companies WHERE companies.id = connections.company_id AND companies.email = auth.email()
-  )
-);
+CREATE POLICY "connections_select_policy" ON connections
+  FOR SELECT USING (
+    auth.uid() = developer_id OR 
+    auth.uid() = company_id
+  );
 
-CREATE POLICY "authenticated users can create connections"
-ON public.connections
-FOR INSERT TO authenticated
-WITH CHECK (true);
+CREATE POLICY "connections_insert_policy" ON connections
+  FOR INSERT WITH CHECK (
+    auth.uid() = developer_id OR 
+    auth.uid() = company_id
+  );
 
-CREATE POLICY "users can update connections they're involved in"
-ON public.connections
-FOR UPDATE TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM developers WHERE developers.id = connections.developer_id AND developers.email = auth.email()
-  ) OR
-  EXISTS (
-    SELECT 1 FROM companies WHERE companies.id = connections.company_id AND companies.email = auth.email()
-  )
-);
+CREATE POLICY "connections_update_policy" ON connections
+  FOR UPDATE USING (
+    auth.uid() = developer_id OR 
+    auth.uid() = company_id
+  );
+
+CREATE POLICY "connections_delete_policy" ON connections
+  FOR DELETE USING (
+    auth.uid() = developer_id OR 
+    auth.uid() = company_id
+  );
 
 -- Políticas para applications
-CREATE POLICY "users can view applications they're involved in"
-ON public.applications
-FOR SELECT TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM developers WHERE developers.id = applications.developer_id AND developers.email = auth.email()
-  ) OR
-  EXISTS (
-    SELECT 1 FROM companies 
-    JOIN projects ON projects.company_id = companies.id 
-    WHERE projects.id = applications.project_id AND companies.email = auth.email()
-  )
-);
+CREATE POLICY "applications_select_policy" ON applications
+  FOR SELECT USING (
+    auth.uid() = developer_id OR 
+    EXISTS (
+      SELECT 1 FROM projects 
+      WHERE projects.id = applications.project_id 
+      AND projects.company_id = auth.uid()
+    )
+  );
 
-CREATE POLICY "developers can create applications"
-ON public.applications
-FOR INSERT TO authenticated
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM developers WHERE developers.id = applications.developer_id AND developers.email = auth.email()
-  )
-);
+CREATE POLICY "applications_insert_policy" ON applications
+  FOR INSERT WITH CHECK (auth.uid() = developer_id);
 
-CREATE POLICY "companies can update applications to their projects"
-ON public.applications
-FOR UPDATE TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM companies 
-    JOIN projects ON projects.company_id = companies.id 
-    WHERE projects.id = applications.project_id AND companies.email = auth.email()
-  )
-);
+CREATE POLICY "applications_update_policy" ON applications
+  FOR UPDATE USING (
+    auth.uid() = developer_id OR 
+    EXISTS (
+      SELECT 1 FROM projects 
+      WHERE projects.id = applications.project_id 
+      AND projects.company_id = auth.uid()
+    )
+  );
 
--- Índices para mejorar el rendimiento
+CREATE POLICY "applications_delete_policy" ON applications
+  FOR DELETE USING (
+    auth.uid() = developer_id OR 
+    EXISTS (
+      SELECT 1 FROM projects 
+      WHERE projects.id = applications.project_id 
+      AND projects.company_id = auth.uid()
+    )
+  );
+
+-- Insertar datos de ejemplo para developers (solo para testing)
+INSERT INTO developers (id, name, email, skills, github, linkedin) VALUES
+  ('550e8400-e29b-41d4-a716-446655440001', 'Juan Pérez', 'juan@ejemplo.com', ARRAY['React', 'TypeScript', 'Node.js'], 'https://github.com/juanperez', 'https://linkedin.com/in/juanperez'),
+  ('550e8400-e29b-41d4-a716-446655440002', 'María García', 'maria@ejemplo.com', ARRAY['Python', 'Django', 'PostgreSQL'], 'https://github.com/mariagarcia', 'https://linkedin.com/in/mariagarcia'),
+  ('550e8400-e29b-41d4-a716-446655440003', 'Carlos López', 'carlos@ejemplo.com', ARRAY['Vue.js', 'JavaScript', 'CSS'], 'https://github.com/carloslopez', 'https://linkedin.com/in/carloslopez'),
+  ('550e8400-e29b-41d4-a716-446655440004', 'Ana Rodríguez', 'ana@ejemplo.com', ARRAY['React Native', 'Firebase', 'JavaScript'], 'https://github.com/anarodriguez', 'https://linkedin.com/in/anarodriguez'),
+  ('550e8400-e29b-41d4-a716-446655440005', 'Luis Martínez', 'luis@ejemplo.com', ARRAY['Java', 'Spring Boot', 'MySQL'], 'https://github.com/luismartinez', 'https://linkedin.com/in/luismartinez');
+
+-- Insertar datos de ejemplo para companies (solo para testing)
+INSERT INTO companies (id, name, email, sector, description) VALUES
+  ('660e8400-e29b-41d4-a716-446655440001', 'TechCorp', 'contact@techcorp.com', 'Technology', 'Empresa líder en desarrollo de software y soluciones digitales'),
+  ('660e8400-e29b-41d4-a716-446655440002', 'Digital Solutions', 'hello@digitalsolutions.com', 'Technology', 'Especialistas en soluciones digitales y transformación tecnológica'),
+  ('660e8400-e29b-41d4-a716-446655440003', 'Innovation Labs', 'info@innovationlabs.com', 'Research', 'Laboratorio de innovación tecnológica y desarrollo de productos'),
+  ('660e8400-e29b-41d4-a716-446655440004', 'StartupHub', 'hello@startuphub.com', 'Startup', 'Plataforma para conectar startups con talento tecnológico'),
+  ('660e8400-e29b-41d4-a716-446655440005', 'Enterprise Solutions', 'contact@enterprisesolutions.com', 'Enterprise', 'Soluciones empresariales a gran escala');
+
+-- Insertar datos de ejemplo para projects (solo para testing)
+INSERT INTO projects (id, title, description, company_id, skills_required, budget_range, project_type) VALUES
+  ('770e8400-e29b-41d4-a716-446655440001', 'App de E-commerce', 'Desarrollo de aplicación móvil para ventas online con sistema de pagos integrado', '660e8400-e29b-41d4-a716-446655440001', ARRAY['React Native', 'Node.js', 'Stripe'], '$5000-$10000', 'freelance'),
+  ('770e8400-e29b-41d4-a716-446655440002', 'Dashboard Analytics', 'Panel de control con métricas empresariales y visualizaciones en tiempo real', '660e8400-e29b-41d4-a716-446655440002', ARRAY['Vue.js', 'Python', 'PostgreSQL', 'D3.js'], '$8000-$15000', 'contract'),
+  ('770e8400-e29b-41d4-a716-446655440003', 'Sistema de Gestión', 'Software para administración de inventarios y control de stock', '660e8400-e29b-41d4-a716-446655440003', ARRAY['React', 'TypeScript', 'Node.js', 'MongoDB'], '$12000-$20000', 'full-time'),
+  ('770e8400-e29b-41d4-a716-446655440004', 'Plataforma de Cursos', 'Sistema LMS para crear y gestionar cursos online', '660e8400-e29b-41d4-a716-446655440004', ARRAY['React', 'Node.js', 'PostgreSQL', 'AWS'], '$15000-$25000', 'freelance'),
+  ('770e8400-e29b-41d4-a716-446655440005', 'API de Microservicios', 'Arquitectura de microservicios para aplicación empresarial', '660e8400-e29b-41d4-a716-446655440005', ARRAY['Java', 'Spring Boot', 'Docker', 'Kubernetes'], '$20000-$35000', 'full-time');
+
+-- Insertar datos de ejemplo para connections (solo para testing)
+INSERT INTO connections (id, developer_id, company_id, status, message) VALUES
+  ('880e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001', '660e8400-e29b-41d4-a716-446655440001', 'accepted', 'Me interesa trabajar en proyectos de React y Node.js'),
+  ('880e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440002', '660e8400-e29b-41d4-a716-446655440002', 'pending', 'Tengo experiencia en Python y Django, me gustaría colaborar'),
+  ('880e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440003', '660e8400-e29b-41d4-a716-446655440003', 'accepted', 'Especialista en frontend, disponible para proyectos de Vue.js'),
+  ('880e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440004', '660e8400-e29b-41d4-a716-446655440004', 'pending', 'Desarrolladora móvil con experiencia en React Native'),
+  ('880e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440005', '660e8400-e29b-41d4-a716-446655440005', 'rejected', 'Java developer buscando oportunidades en proyectos empresariales');
+
+-- Insertar datos de ejemplo para applications (solo para testing)
+INSERT INTO applications (id, project_id, developer_id, cover_letter, proposed_rate, status) VALUES
+  ('990e8400-e29b-41d4-a716-446655440001', '770e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001', 'Tengo 3 años de experiencia en React Native y he desarrollado apps similares. Me apasiona crear experiencias de usuario excepcionales.', 7500, 'pending'),
+  ('990e8400-e29b-41d4-a716-446655440002', '770e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440002', 'Especialista en Python y Django con experiencia en proyectos de analytics. Me gustaría contribuir a este dashboard.', 12000, 'reviewed'),
+  ('990e8400-e29b-41d4-a716-446655440003', '770e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440003', 'Frontend developer con experiencia en React y TypeScript. Me interesa este proyecto de gestión.', 15000, 'accepted'),
+  ('990e8400-e29b-41d4-a716-446655440004', '770e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440004', 'Desarrolladora móvil con experiencia en React Native y plataformas educativas. Perfecto para este LMS.', 18000, 'pending'),
+  ('990e8400-e29b-41d4-a716-446655440005', '770e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440005', 'Java developer senior con experiencia en microservicios y arquitecturas empresariales.', 25000, 'reviewed');
+
+-- Crear índices para mejorar el rendimiento
 CREATE INDEX idx_developers_email ON developers(email);
-CREATE INDEX idx_developers_skills ON developers USING GIN(skills);
 CREATE INDEX idx_companies_email ON companies(email);
-CREATE INDEX idx_companies_sector ON companies(sector);
-CREATE INDEX idx_projects_company ON projects(company_id);
-CREATE INDEX idx_projects_skills ON projects USING GIN(skills_required);
-CREATE INDEX idx_projects_status ON projects(status);
-CREATE INDEX idx_connections_developer ON connections(developer_id);
-CREATE INDEX idx_connections_company ON connections(company_id);
-CREATE INDEX idx_applications_project ON applications(project_id);
-CREATE INDEX idx_applications_developer ON applications(developer_id);
-CREATE INDEX idx_applications_status ON applications(status);
+CREATE INDEX idx_projects_company_id ON projects(company_id);
+CREATE INDEX idx_connections_developer_id ON connections(developer_id);
+CREATE INDEX idx_connections_company_id ON connections(company_id);
+CREATE INDEX idx_applications_project_id ON applications(project_id);
+CREATE INDEX idx_applications_developer_id ON applications(developer_id);
 
--- Comentarios sobre la estructura
-COMMENT ON TABLE developers IS 'Perfiles de desarrolladores con skills y enlaces profesionales';
-COMMENT ON TABLE companies IS 'Perfiles de empresas por sector y descripción';
-COMMENT ON TABLE projects IS 'Proyectos publicados por empresas con skills requeridos';
-COMMENT ON TABLE connections IS 'Conexiones entre developers y empresas';
-COMMENT ON TABLE applications IS 'Aplicaciones de developers a proyectos específicos';
+-- Función para actualizar el timestamp de updated_at (opcional)
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Triggers para actualizar updated_at (opcional)
+-- CREATE TRIGGER update_developers_updated_at BEFORE UPDATE ON developers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON projects FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TRIGGER update_connections_updated_at BEFORE UPDATE ON connections FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TRIGGER update_applications_updated_at BEFORE UPDATE ON applications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

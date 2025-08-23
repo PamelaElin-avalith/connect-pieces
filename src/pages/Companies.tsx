@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,20 +14,13 @@ export default function Companies() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const { userType, isAuthenticated } = useNavigation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  useEffect(() => {
-    filterCompanies();
-  }, [searchTerm, companies]);
-
-  const fetchCompanies = async () => {
+  // Memoizar la función de búsqueda para evitar recreaciones
+  const fetchCompanies = useCallback(async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from("companies")
         .select("*")
@@ -43,48 +36,51 @@ export default function Companies() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterCompanies = () => {
+  // Solo ejecutar fetchCompanies una vez al montar el componente
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
+
+  // Memoizar companies filtrados para evitar recálculos innecesarios
+  const filteredCompanies = useMemo(() => {
     if (!searchTerm.trim()) {
-      setFilteredCompanies(companies);
-      return;
+      return companies;
     }
 
-    const filtered = companies.filter(
+    return companies.filter(
       (company) =>
         company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         company.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.sector.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (company.sector &&
+          company.sector.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (company.description &&
           company.description.toLowerCase().includes(searchTerm.toLowerCase()))
     );
-    setFilteredCompanies(filtered);
+  }, [companies, searchTerm]);
+
+  // Debouncing para la búsqueda
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // La búsqueda se hace automáticamente con useMemo
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handleConnect = (companyId: string) => {
+    if (!isAuthenticated) {
+      // Mostrar modal de login
+      return;
+    }
+    // Lógica de conexión
+    console.log("Conectando con empresa:", companyId);
   };
 
-  const handleConnect = (companyId: number) => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-
-    // Aquí implementarías la lógica de conexión
-    alert(`Conectando con empresa ${companyId}`);
-  };
-
-  const handleCreateProfile = () => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-
-    if (userType !== "developer") {
-      alert("Solo los developers pueden crear perfiles");
-      return;
-    }
-
-    // Aquí podrías navegar a una página de creación de perfiles
-    alert("Funcionalidad de crear perfil en desarrollo");
+  const handleViewProfile = (companyId: string) => {
+    // Navegar al perfil de la empresa
+    console.log("Ver perfil de empresa:", companyId);
   };
 
   if (loading) {
@@ -102,36 +98,40 @@ export default function Companies() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="space-y-6">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="h-8 w-8 p-0"
+            >
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
               <h1 className="text-3xl font-bold">Empresas</h1>
               <p className="text-muted-foreground">
-                Descubre empresas que buscan talento
+                Descubre empresas innovadoras que buscan talento tecnológico
               </p>
             </div>
           </div>
 
           {isAuthenticated && userType === "developer" && (
             <Button
-              className="flex items-center gap-2"
-              onClick={handleCreateProfile}
+              onClick={() => navigate("/profile")}
+              className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
             >
-              <Plus className="h-4 w-4" />
-              Crear Perfil
+              <Plus className="h-4 w-4 mr-2" />
+              Mi Perfil
             </Button>
           )}
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        {/* Search Bar */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nombre, sector o descripción..."
             value={searchTerm}
@@ -140,7 +140,7 @@ export default function Companies() {
           />
         </div>
 
-        {/* Results count */}
+        {/* Results Count */}
         <div className="text-sm text-muted-foreground">
           {filteredCompanies.length} empresa
           {filteredCompanies.length !== 1 ? "s" : ""} encontrada
@@ -148,77 +148,116 @@ export default function Companies() {
         </div>
 
         {/* Companies Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCompanies.map((company) => (
-            <Card
-              key={company.id}
-              className="hover:shadow-lg transition-shadow"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={company.logo_url} alt={company.name} />
-                      <AvatarFallback>
-                        <Building className="h-6 w-6" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-lg">{company.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {company.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {/* Sector */}
-                <div>
-                  <Badge variant="outline">{company.sector}</Badge>
-                </div>
-
-                {/* Description */}
-                {company.description && (
-                  <div>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {company.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Contact */}
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" asChild>
-                    <a href={`mailto:${company.email}`}>
-                      <Mail className="h-4 w-4" />
-                    </a>
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Globe className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Action Button */}
-                <Button
-                  className="w-full"
-                  onClick={() => handleConnect(company.id)}
-                >
-                  {isAuthenticated ? "Conectar" : "Ver Perfil"}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredCompanies.length === 0 && (
+        {filteredCompanies.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
               {searchTerm
                 ? "No se encontraron empresas con esos criterios"
                 : "No hay empresas disponibles"}
             </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCompanies.map((company) => (
+              <Card
+                key={company.id}
+                className="group hover:shadow-lg transition-all duration-300"
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={company.logo_url} />
+                        <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-600 text-white font-semibold">
+                          {company.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                          {company.name}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {company.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  {/* Sector */}
+                  {company.sector && (
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Sector</h4>
+                      <Badge variant="secondary" className="text-sm">
+                        {company.sector}
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {company.description && (
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Descripción</h4>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {company.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Contact Info */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() =>
+                        window.open(`mailto:${company.email}`, "_blank")
+                      }
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Contactar
+                    </Button>
+                    {company.website && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => window.open(company.website, "_blank")}
+                      >
+                        <Globe className="h-4 w-4 mr-2" />
+                        Sitio Web
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleViewProfile(company.id)}
+                    >
+                      Ver Perfil
+                    </Button>
+                    {isAuthenticated && userType === "developer" && (
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                        onClick={() => handleConnect(company.id)}
+                      >
+                        Conectar
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
       </div>

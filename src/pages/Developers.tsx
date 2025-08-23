@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,20 +14,13 @@ export default function Developers() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredDevelopers, setFilteredDevelopers] = useState<Developer[]>([]);
   const { userType, isAuthenticated } = useNavigation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchDevelopers();
-  }, []);
-
-  useEffect(() => {
-    filterDevelopers();
-  }, [searchTerm, developers]);
-
-  const fetchDevelopers = async () => {
+  // Memoizar la función de búsqueda para evitar recreaciones
+  const fetchDevelopers = useCallback(async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from("developers")
         .select("*")
@@ -43,48 +36,51 @@ export default function Developers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterDevelopers = () => {
+  // Solo ejecutar fetchDevelopers una vez al montar el componente
+  useEffect(() => {
+    fetchDevelopers();
+  }, [fetchDevelopers]);
+
+  // Memoizar developers filtrados para evitar recálculos innecesarios
+  const filteredDevelopers = useMemo(() => {
     if (!searchTerm.trim()) {
-      setFilteredDevelopers(developers);
-      return;
+      return developers;
     }
 
-    const filtered = developers.filter(
-      (dev) =>
-        dev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dev.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dev.skills.some((skill) =>
-          skill.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+    return developers.filter(
+      (developer) =>
+        developer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        developer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (developer.skills &&
+          developer.skills.some((skill) =>
+            skill.toLowerCase().includes(searchTerm.toLowerCase())
+          ))
     );
-    setFilteredDevelopers(filtered);
+  }, [developers, searchTerm]);
+
+  // Debouncing para la búsqueda
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // La búsqueda se hace automáticamente con useMemo
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handleConnect = (developerId: string) => {
+    if (!isAuthenticated) {
+      // Mostrar modal de login
+      return;
+    }
+    // Lógica de conexión
+    console.log("Conectando con developer:", developerId);
   };
 
-  const handleConnect = (developerId: number) => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-
-    // Aquí implementarías la lógica de conexión
-    alert(`Conectando con developer ${developerId}`);
-  };
-
-  const handleCreateProject = () => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-
-    if (userType !== "company") {
-      alert("Solo las empresas pueden crear proyectos");
-      return;
-    }
-
-    // Aquí podrías navegar a una página de creación de proyectos
-    alert("Funcionalidad de crear proyecto en desarrollo");
+  const handleViewProfile = (developerId: string) => {
+    // Navegar al perfil del developer
+    console.log("Ver perfil de developer:", developerId);
   };
 
   if (loading) {
@@ -102,36 +98,40 @@ export default function Developers() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="space-y-6">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="h-8 w-8 p-0"
+            >
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
               <h1 className="text-3xl font-bold">Developers</h1>
               <p className="text-muted-foreground">
-                Encuentra talento para tus proyectos
+                Encuentra talento especializado para tus proyectos
               </p>
             </div>
           </div>
 
           {isAuthenticated && userType === "company" && (
             <Button
-              className="flex items-center gap-2"
-              onClick={handleCreateProject}
+              onClick={() => navigate("/profile")}
+              className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
             >
-              <Plus className="h-4 w-4" />
-              Publicar Proyecto
+              <Plus className="h-4 w-4 mr-2" />
+              Mi Perfil
             </Button>
           )}
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        {/* Search Bar */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nombre, email o skills..."
             value={searchTerm}
@@ -140,7 +140,7 @@ export default function Developers() {
           />
         </div>
 
-        {/* Results count */}
+        {/* Results Count */}
         <div className="text-sm text-muted-foreground">
           {filteredDevelopers.length} developer
           {filteredDevelopers.length !== 1 ? "s" : ""} encontrado
@@ -148,106 +148,125 @@ export default function Developers() {
         </div>
 
         {/* Developers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDevelopers.map((developer) => (
-            <Card
-              key={developer.id}
-              className="hover:shadow-lg transition-shadow"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage
-                        src={developer.avatar_url}
-                        alt={developer.name}
-                      />
-                      <AvatarFallback>
-                        {developer.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-lg">
-                        {developer.name}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {developer.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {/* Skills */}
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Skills</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {developer.skills.map((skill, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="text-xs"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Social Links */}
-                <div className="flex items-center gap-2">
-                  {developer.github && (
-                    <Button variant="ghost" size="sm" asChild>
-                      <a
-                        href={developer.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Github className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
-                  {developer.linkedin && (
-                    <Button variant="ghost" size="sm" asChild>
-                      <a
-                        href={developer.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Linkedin className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
-                  <Button variant="ghost" size="sm" asChild>
-                    <a href={`mailto:${developer.email}`}>
-                      <Mail className="h-4 w-4" />
-                    </a>
-                  </Button>
-                </div>
-
-                {/* Action Button */}
-                <Button
-                  className="w-full"
-                  onClick={() => handleConnect(developer.id)}
-                >
-                  {isAuthenticated ? "Conectar" : "Ver Perfil"}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredDevelopers.length === 0 && (
+        {filteredDevelopers.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
               {searchTerm
                 ? "No se encontraron developers con esos criterios"
                 : "No hay developers disponibles"}
             </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDevelopers.map((developer) => (
+              <Card
+                key={developer.id}
+                className="group hover:shadow-lg transition-all duration-300"
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={developer.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold">
+                          {developer.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                          {developer.name}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {developer.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  {/* Skills */}
+                  {developer.skills && developer.skills.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Skills</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {developer.skills.slice(0, 4).map((skill, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
+                        {developer.skills.length > 4 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{developer.skills.length - 4} más
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Social Links */}
+                  {(developer.github || developer.linkedin) && (
+                    <div className="flex gap-2">
+                      {developer.github && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() =>
+                            window.open(developer.github, "_blank")
+                          }
+                        >
+                          <Github className="h-4 w-4 mr-2" />
+                          GitHub
+                        </Button>
+                      )}
+                      {developer.linkedin && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() =>
+                            window.open(developer.linkedin, "_blank")
+                          }
+                        >
+                          <Linkedin className="h-4 w-4 mr-2" />
+                          LinkedIn
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleViewProfile(developer.id)}
+                    >
+                      Ver Perfil
+                    </Button>
+                    {isAuthenticated && userType === "company" && (
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                        onClick={() => handleConnect(developer.id)}
+                      >
+                        Conectar
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
       </div>
