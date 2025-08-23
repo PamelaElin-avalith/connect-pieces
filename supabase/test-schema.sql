@@ -12,7 +12,9 @@ CREATE TABLE developers (
   skills text[] DEFAULT '{}',
   github text,
   linkedin text,
+  web_url text,
   avatar_url text,
+  cv_url text,
   created_at timestamp with time zone DEFAULT now()
 );
 

@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileUpload } from "@/components/ui/file-upload";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { supabase } from "@/lib/supabaseClient";
+import { StorageService } from "@/lib/storage";
 import { toast } from "@/hooks/use-toast";
 import {
   User,
@@ -48,7 +50,11 @@ export const AuthModal: React.FC = () => {
     skills: "",
     github: "",
     linkedin: "",
+    web_url: "",
+    cv_url: "",
   });
+
+  const [selectedCVFile, setSelectedCVFile] = useState<File | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -109,6 +115,26 @@ export const AuthModal: React.FC = () => {
 
         // 3. Crear perfil en la base de datos usando el ID del usuario autenticado
         if (selectedUserType === "developer") {
+          // Subir CV si se seleccionó un archivo
+          let cvUrl = null;
+          if (selectedCVFile) {
+            // Asegurar que el bucket existe
+            await StorageService.ensureBucketExists();
+
+            // Subir archivo
+            const uploadResult = await StorageService.uploadCV(
+              selectedCVFile,
+              authData.user.id
+            );
+
+            if (uploadResult.success && uploadResult.url) {
+              cvUrl = uploadResult.url;
+            } else {
+              console.warn("No se pudo subir el CV:", uploadResult.error);
+              // Continuar sin CV si falla la subida
+            }
+          }
+
           const { error: profileError } = await supabase
             .from("developers")
             .insert({
@@ -120,6 +146,8 @@ export const AuthModal: React.FC = () => {
                 : [],
               github: formData.github || null,
               linkedin: formData.linkedin || null,
+              web_url: formData.web_url || null,
+              cv_url: cvUrl,
             });
 
           if (profileError) {
@@ -270,7 +298,8 @@ export const AuthModal: React.FC = () => {
         errorMessage =
           "Este email ya está registrado. Intenta iniciar sesión en su lugar.";
       } else if (errorMessage.includes("Email not confirmed")) {
-        errorMessage = "Por favor, confirma tu email antes de iniciar sesión";
+        errorMessage =
+          "Por favor, confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada y spam.";
       } else if (errorMessage.includes("401")) {
         errorMessage = "Error de autenticación. Verifica tus credenciales.";
       }
@@ -296,13 +325,43 @@ export const AuthModal: React.FC = () => {
       skills: "",
       github: "",
       linkedin: "",
+      web_url: "",
+      cv_url: "",
     });
+    setSelectedCVFile(null);
     setSelectedUserType("developer");
   };
 
   const handleClose = () => {
     setShowAuthModal(false);
     resetForm();
+  };
+
+  const handleResendConfirmation = async (email: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email reenviado",
+        description:
+          "Se ha reenviado el email de confirmación. Revisa tu bandeja de entrada y spam.",
+      });
+    } catch (error: unknown) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Error al reenviar el email",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!showAuthModal) return null;
@@ -442,6 +501,20 @@ export const AuthModal: React.FC = () => {
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {loading ? "Iniciando..." : "Iniciar Sesión"}
                 </Button>
+
+                {/* Botón para reenviar confirmación */}
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={() => handleResendConfirmation(formData.email)}
+                    disabled={loading || !formData.email}
+                    className="text-xs text-muted-foreground hover:text-primary"
+                  >
+                    ¿No recibiste el email de confirmación? Reenviar
+                  </Button>
+                </div>
               </form>
             </TabsContent>
 
@@ -569,6 +642,35 @@ export const AuthModal: React.FC = () => {
                           />
                         </div>
                       </div>
+                    </div>
+
+                    {/* Web URL */}
+                    <div className="space-y-2">
+                      <Label htmlFor="web_url">Sitio Web (URL)</Label>
+                      <Input
+                        id="web_url"
+                        type="url"
+                        placeholder="https://tu-sitio.com"
+                        value={formData.web_url}
+                        onChange={(e) =>
+                          handleInputChange("web_url", e.target.value)
+                        }
+                        className="h-10 sm:h-11"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Pega la URL de tu sitio web personal o de tu portafolio
+                      </p>
+                    </div>
+
+                    {/* CV Upload */}
+                    <div className="space-y-2">
+                      <FileUpload
+                        onFileSelect={(file) => {
+                          setSelectedCVFile(file);
+                        }}
+                        acceptedTypes={[".pdf"]}
+                        maxSize={5}
+                      />
                     </div>
                   </>
                 ) : (

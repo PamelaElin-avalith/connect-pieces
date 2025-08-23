@@ -13,7 +13,9 @@ export interface Developer {
   skills: string[]
   github?: string | null
   linkedin?: string | null
+  web_url?: string | null
   avatar_url?: string | null
+  cv_url?: string | null
   created_at: string
 }
 

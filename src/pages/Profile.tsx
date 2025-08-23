@@ -7,8 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileUpload } from "@/components/ui/file-upload";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
+import { ChangeEmailModal } from "@/components/settings/ChangeEmailModal";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { supabase } from "@/lib/supabaseClient";
+import { StorageService } from "@/lib/storage";
 import { toast } from "@/hooks/use-toast";
 import {
   User,
@@ -24,6 +28,8 @@ import {
   Trash2,
   Upload,
   ArrowLeft,
+  FileText,
+  AlertTriangle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -35,6 +41,12 @@ export default function Profile() {
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
+  const [selectedCVFile, setSelectedCVFile] = useState<File | null>(null);
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
+    null
+  );
+  const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
   useEffect(() => {
     if (currentUser?.profile) {
@@ -59,6 +71,53 @@ export default function Profile() {
     setLoading(true);
     try {
       const table = userType === "developer" ? "developers" : "companies";
+
+      // Si hay un archivo CV seleccionado, subirlo primero
+      if (userType === "developer" && selectedCVFile) {
+        // Asegurar que el bucket existe
+        await StorageService.ensureBucketExists();
+
+        // Subir archivo
+        const uploadResult = await StorageService.uploadCV(
+          selectedCVFile,
+          profile.id
+        );
+
+        if (uploadResult.success && uploadResult.url) {
+          formData.cv_url = uploadResult.url;
+        } else {
+          toast({
+            title: "Advertencia",
+            description:
+              "No se pudo subir el CV. El perfil se guardará sin CV.",
+            variant: "destructive",
+          });
+        }
+      }
+
+      // Si hay un archivo de avatar seleccionado, subirlo
+      if (selectedAvatarFile) {
+        // Asegurar que el bucket existe
+        await StorageService.ensureAvatarBucketExists();
+
+        // Subir avatar
+        const uploadResult = await StorageService.uploadAvatar(
+          selectedAvatarFile,
+          profile.id
+        );
+
+        if (uploadResult.success && uploadResult.url) {
+          formData.avatar_url = uploadResult.url;
+        } else {
+          toast({
+            title: "Advertencia",
+            description:
+              "No se pudo subir el avatar. El perfil se guardará sin avatar.",
+            variant: "destructive",
+          });
+        }
+      }
+
       const { error } = await supabase
         .from(table)
         .update(formData)
@@ -69,6 +128,8 @@ export default function Profile() {
       setProfile(formData);
       setCurrentUser({ ...currentUser, profile: formData });
       setEditing(false);
+      setSelectedCVFile(null);
+      setSelectedAvatarFile(null);
 
       toast({
         title: "Perfil actualizado",
@@ -88,6 +149,8 @@ export default function Profile() {
   const handleCancel = () => {
     setFormData(profile);
     setEditing(false);
+    setSelectedCVFile(null);
+    setSelectedAvatarFile(null);
   };
 
   if (!profile) {
@@ -147,15 +210,29 @@ export default function Profile() {
         <Card className="overflow-hidden">
           <div className="bg-gradient-to-r from-primary/10 to-purple-600/10 p-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
-              <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-                <AvatarImage src={profile.avatar_url || profile.logo_url} />
-                <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary to-purple-600 text-white">
-                  {profile.name
-                    ?.split(" ")
-                    .map((n: string) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
+              {editing ? (
+                <AvatarUpload
+                  currentAvatarUrl={profile.avatar_url || profile.logo_url}
+                  onAvatarChange={(file) => {
+                    setSelectedAvatarFile(file);
+                  }}
+                  onAvatarRemove={() => {
+                    setSelectedAvatarFile(null);
+                    formData.avatar_url = null;
+                  }}
+                  size="lg"
+                />
+              ) : (
+                <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+                  <AvatarImage src={profile.avatar_url || profile.logo_url} />
+                  <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary to-purple-600 text-white">
+                    {profile.name
+                      ?.split(" ")
+                      .map((n: string) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+              )}
               <div className="text-center md:text-left">
                 <h2 className="text-3xl font-bold mb-2">{profile.name}</h2>
                 <p className="text-lg text-muted-foreground mb-4">
@@ -383,44 +460,80 @@ export default function Profile() {
                         </div>
                       )}
                     </div>
-                  </>
-                )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="website">Sitio Web</Label>
-                  {editing ? (
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="website"
-                        placeholder="https://tu-sitio.com"
-                        value={formData.website || ""}
-                        onChange={(e) =>
-                          handleInputChange("website", e.target.value)
-                        }
-                        className="pl-10"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      {profile.website ? (
-                        <a
-                          href={profile.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                        >
-                          {profile.website}
-                        </a>
+                    {/* Web URL */}
+                    <div className="space-y-2">
+                      <Label htmlFor="web_url">Sitio Web</Label>
+                      {editing ? (
+                        <div className="relative">
+                          <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="web_url"
+                            type="url"
+                            placeholder="https://tu-sitio.com"
+                            value={formData.web_url || ""}
+                            onChange={(e) =>
+                              handleInputChange("web_url", e.target.value)
+                            }
+                            className="pl-10"
+                          />
+                        </div>
                       ) : (
-                        <span className="text-muted-foreground">
-                          No configurado
-                        </span>
+                        <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          {profile.web_url ? (
+                            <a
+                              href={profile.web_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              {profile.web_url}
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">
+                              No configurado
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
+
+                    {/* CV Upload */}
+                    <div className="space-y-2">
+                      {editing ? (
+                        <FileUpload
+                          onFileSelect={(file) => {
+                            setSelectedCVFile(file);
+                          }}
+                          acceptedTypes={[".pdf"]}
+                          maxSize={5}
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          <Label>CV</Label>
+                          <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            {profile.cv_url ? (
+                              <a
+                                href={profile.cv_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                Ver CV
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground">
+                                No configurado
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -446,17 +559,30 @@ export default function Profile() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setEditing(true)}
+                    disabled={editing}
+                  >
                     <Upload className="h-4 w-4 mr-2" />
                     Cambiar Avatar
                   </Button>
-                  <Button variant="outline" className="flex-1">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowChangeEmailModal(true)}
+                  >
                     <Mail className="h-4 w-4 mr-2" />
                     Cambiar Email
                   </Button>
                 </div>
 
-                <Button variant="destructive" className="w-full">
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => setShowDeleteAccountModal(true)}
+                >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Eliminar Cuenta
                 </Button>
@@ -465,6 +591,46 @@ export default function Profile() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modales de Configuración */}
+      <ChangeEmailModal
+        isOpen={showChangeEmailModal}
+        onClose={() => setShowChangeEmailModal(false)}
+        currentEmail={profile.email}
+      />
+
+      {/* Modal de Eliminar Cuenta (placeholder por ahora) */}
+      {showDeleteAccountModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-background rounded-lg border shadow-lg">
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
+                <h3 className="text-lg font-semibold">Eliminar Cuenta</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Esta acción no se puede deshacer. Se eliminará permanentemente
+                tu cuenta y todos los datos asociados.
+              </p>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteAccountModal(false)}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button variant="destructive" className="flex-1" disabled>
+                  Eliminar
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Funcionalidad en desarrollo
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
