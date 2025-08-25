@@ -1,20 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { PuzzleCard, PuzzleCardContent, PuzzleCardHeader } from "@/components/ui/puzzle-card";
+import {
+  PuzzleCard,
+  PuzzleCardContent,
+  PuzzleCardHeader,
+} from "@/components/ui/puzzle-card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/Header";
-import { 
-  PuzzleIcon, 
-  Users, 
-  Building, 
-  Code, 
-  Briefcase, 
+import {
+  PuzzleIcon,
+  Users,
+  Building,
+  Code,
+  Briefcase,
   Star,
   ArrowRight,
   Github,
   Linkedin,
   MapPin,
   Calendar,
-  User
+  User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -28,7 +32,8 @@ export const Home = () => {
       experience: "3 años",
       location: "Madrid, España",
       rating: 4.9,
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
     },
     {
       id: 2,
@@ -38,7 +43,8 @@ export const Home = () => {
       experience: "5 años",
       location: "Barcelona, España",
       rating: 4.8,
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+      avatar:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     },
     {
       id: 3,
@@ -48,14 +54,15 @@ export const Home = () => {
       experience: "4 años",
       location: "Valencia, España",
       rating: 4.9,
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
-    }
+      avatar:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-4xl mx-auto space-y-8">
@@ -63,19 +70,19 @@ export const Home = () => {
             <PuzzleIcon className="h-20 w-20 text-primary mx-auto mb-6" />
             <div className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-accent animate-pulse"></div>
           </div>
-          
+
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             Conecta. Encuentra. Crece.
           </h1>
-          
+
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            La plataforma donde developers y empresas se conectan como piezas de rompecabezas perfectas. 
-            Encuentra tu match ideal en el mundo tech.
+            La plataforma donde developers y empresas se conectan como piezas de
+            rompecabezas perfectas. Encuentra tu match ideal en el mundo tech.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-lg px-8 py-6"
               asChild
             >
@@ -84,9 +91,9 @@ export const Home = () => {
                 Soy Developer
               </Link>
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            <Button
+              size="lg"
+              variant="outline"
               className="text-lg px-8 py-6 border-2"
               asChild
             >
@@ -102,8 +109,10 @@ export const Home = () => {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">¿Por qué PuzzleConnect?</h2>
-          <p className="text-muted-foreground text-lg">Conectamos talento con oportunidades de manera inteligente</p>
+          <h2 className="text-3xl font-bold mb-4">¿Por qué ConnectPieces?</h2>
+          <p className="text-muted-foreground text-lg">
+            Conectamos talento con oportunidades de manera inteligente
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -114,7 +123,8 @@ export const Home = () => {
             </PuzzleCardHeader>
             <PuzzleCardContent>
               <p className="text-muted-foreground">
-                Todos los developers son verificados con sus proyectos reales en GitHub y experiencia comprobada.
+                Todos los developers son verificados con sus proyectos reales en
+                GitHub y experiencia comprobada.
               </p>
             </PuzzleCardContent>
           </PuzzleCard>
@@ -126,7 +136,8 @@ export const Home = () => {
             </PuzzleCardHeader>
             <PuzzleCardContent>
               <p className="text-muted-foreground">
-                Nuestro algoritmo conecta developers con empresas basado en skills, experiencia y cultura.
+                Nuestro algoritmo conecta developers con empresas basado en
+                skills, experiencia y cultura.
               </p>
             </PuzzleCardContent>
           </PuzzleCard>
@@ -138,7 +149,8 @@ export const Home = () => {
             </PuzzleCardHeader>
             <PuzzleCardContent>
               <p className="text-muted-foreground">
-                Conecta directamente sin intermediarios. Proceso rápido y transparente para ambas partes.
+                Conecta directamente sin intermediarios. Proceso rápido y
+                transparente para ambas partes.
               </p>
             </PuzzleCardContent>
           </PuzzleCard>
@@ -149,15 +161,21 @@ export const Home = () => {
       <section className="container mx-auto px-4 py-16 bg-muted/30">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Developers Destacados</h2>
-          <p className="text-muted-foreground text-lg">Descubre el talento que está transformando la industria</p>
+          <p className="text-muted-foreground text-lg">
+            Descubre el talento que está transformando la industria
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {featuredDevelopers.map((dev) => (
-            <PuzzleCard key={dev.id} variant="developer" className="hover:scale-105 transition-all duration-300">
+            <PuzzleCard
+              key={dev.id}
+              variant="developer"
+              className="hover:scale-105 transition-all duration-300"
+            >
               <PuzzleCardHeader className="text-center">
-                <img 
-                  src={dev.avatar} 
+                <img
+                  src={dev.avatar}
                   alt={dev.name}
                   className="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-primary/20"
                 />
@@ -209,15 +227,22 @@ export const Home = () => {
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-16">
-        <PuzzleCard variant="connection" size="lg" className="text-center max-w-4xl mx-auto">
+        <PuzzleCard
+          variant="connection"
+          size="lg"
+          className="text-center max-w-4xl mx-auto"
+        >
           <PuzzleCardContent className="space-y-6">
-            <h2 className="text-3xl font-bold">¿Listo para encontrar tu pieza perfecta?</h2>
+            <h2 className="text-3xl font-bold">
+              ¿Listo para encontrar tu pieza perfecta?
+            </h2>
             <p className="text-muted-foreground text-lg">
-              Únete a miles de developers y empresas que ya están conectando en PuzzleConnect
+              Únete a miles de developers y empresas que ya están conectando en
+              ConnectPieces
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                 asChild
               >
@@ -237,10 +262,10 @@ export const Home = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center gap-3 mb-4 md:mb-0">
               <PuzzleIcon className="h-6 w-6 text-primary" />
-              <span className="font-semibold">PuzzleConnect</span>
+              <span className="font-semibold">ConnectPieces</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 PuzzleConnect. Conectando talento con oportunidades.
+              © 2024 ConnectPieces. Conectando talento con oportunidades.
             </p>
           </div>
         </div>

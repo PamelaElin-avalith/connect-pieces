@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PuzzleCard, PuzzleCardContent, PuzzleCardHeader } from "@/components/ui/puzzle-card";
+import {
+  PuzzleCard,
+  PuzzleCardContent,
+  PuzzleCardHeader,
+} from "@/components/ui/puzzle-card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PuzzleIcon, User, Building, Mail, Lock } from "lucide-react";
@@ -18,25 +22,37 @@ export const Login = () => {
             <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-accent"></div>
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground">PuzzleConnect</h1>
-            <p className="text-sm text-muted-foreground">Encuentra tu pieza perfecta</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              ConnectPieces
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Encuentra tu pieza perfecta
+            </p>
           </div>
         </div>
 
         <PuzzleCard variant="connection" className="connection-pulse">
           <PuzzleCardHeader className="text-center space-y-2">
             <h2 className="text-2xl font-bold">Iniciar Sesión</h2>
-            <p className="text-muted-foreground">Conecta con oportunidades únicas</p>
+            <p className="text-muted-foreground">
+              Conecta con oportunidades únicas
+            </p>
           </PuzzleCardHeader>
 
           <PuzzleCardContent>
             <Tabs defaultValue="developer" className="space-y-6">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="developer" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="developer"
+                  className="flex items-center gap-2"
+                >
                   <User className="h-4 w-4" />
                   Developer
                 </TabsTrigger>
-                <TabsTrigger value="company" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="company"
+                  className="flex items-center gap-2"
+                >
                   <Building className="h-4 w-4" />
                   Empresa
                 </TabsTrigger>
@@ -108,15 +124,15 @@ export const Login = () => {
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">
                   ¿No tienes cuenta?{" "}
-                  <Link 
-                    to="/register" 
+                  <Link
+                    to="/register"
                     className="text-primary hover:underline font-medium"
                   >
                     Regístrate aquí
                   </Link>
                 </p>
-                <Link 
-                  to="/forgot-password" 
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   ¿Olvidaste tu contraseña?

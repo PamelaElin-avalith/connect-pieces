@@ -399,7 +399,7 @@ export const AuthModal: React.FC = () => {
             <p className="text-sm text-muted-foreground mt-1">
               {authMode === "login"
                 ? "Accede a tu cuenta para conectar con talento"
-                : "Únete a PuzzleConnect y encuentra tu próxima oportunidad"}
+                : "Únete a ConnectPieces y encuentra tu próxima oportunidad"}
             </p>
           </div>
           <Button

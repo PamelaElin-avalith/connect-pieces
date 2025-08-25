@@ -93,7 +93,7 @@ export const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  PuzzleConnect
+                  ConnectPieces
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   Conectando talento

@@ -1,99 +1,88 @@
-# 🧩 Connect Pieces - Plataforma de Conexión Developer-Empresa
+# 🧩 ConnectPieces - Plataforma de Conexión Developer-Empresa
 
-## 🎯 **Descripción del Proyecto**
+**ConnectPieces** es una aplicación web moderna y responsive diseñada para conectar desarrolladores con empresas de manera eficiente y profesional. La plataforma facilita la búsqueda de talento tecnológico y oportunidades de colaboración.
 
-**Connect Pieces** es una aplicación web moderna y responsive que conecta desarrolladores con empresas. La plataforma facilita la búsqueda de talento tecnológico y oportunidades laborales, proporcionando una interfaz intuitiva y funcionalidades avanzadas de gestión de perfiles.
+## 🚀 **Tecnologías Utilizadas**
 
-**🎨 La interfaz de usuario fue completamente desarrollada utilizando [Lovable](https://lovable.dev), una plataforma de desarrollo visual que permite crear aplicaciones web profesionales de manera intuitiva y eficiente.**
+### **Frontend & Desarrollo**
 
-## 🎨 **Desarrollo con Lovable**
-
-### **¿Qué es Lovable?**
-
-[Lovable](https://lovable.dev) es una plataforma de desarrollo visual que permite crear aplicaciones web completas y profesionales sin necesidad de escribir código manualmente. La interfaz de **Connect Pieces** fue desarrollada íntegramente utilizando esta herramienta.
-
-### **Ventajas del Desarrollo con Lovable:**
-
-- **🖱️ Desarrollo Visual** - Interfaz drag & drop intuitiva
-- **⚡ Rapidez** - Creación de componentes en minutos, no horas
-- **🎯 Precisión** - Componentes perfectamente alineados y responsivos
-- **🔧 Flexibilidad** - Personalización completa de estilos y funcionalidades
-- **📱 Responsive** - Diseño automáticamente adaptativo
-- **🎨 Diseño Profesional** - Resultados de calidad empresarial
-
-### **Componentes Desarrollados en Lovable:**
-
-- **Sistema de navegación** completo y responsive
-- **Formularios de autenticación** con validaciones
-- **Perfiles de usuario** con layouts adaptativos
-- **Sistema de temas** claro/oscuro
-- **Componentes UI** modernos y accesibles
-- **Modales y overlays** responsivos
-- **Grids y layouts** adaptativos para todas las pantallas
-
-## ✨ **Características Principales**
-
-### **🔐 Sistema de Autenticación**
-
-- **Registro y Login** con confirmación de email
-- **Dos tipos de usuario**: Developer y Empresa
-- **Perfiles personalizados** con información detallada
-- **Gestión segura** de sesiones con Supabase Auth
-
-### **👤 Gestión de Perfiles**
-
-- **Perfiles de Developer**: Skills, GitHub, LinkedIn, CV, sitio web
-- **Perfiles de Empresa**: Sector, descripción, proyectos
-- **Avatares personalizables** con drag & drop
-- **Edición en tiempo real** de información
-
-### **📁 Sistema de Archivos**
-
-- **Upload de CVs** en formato PDF
-- **Gestión de avatares** con preview
-- **Storage seguro** en Supabase
-- **Validaciones** de tipo y tamaño
-
-### **🎨 Interfaz de Usuario**
-
-- **Diseño responsive** para desktop, tablet y mobile
-- **Tema oscuro/claro** con toggle automático
-- **Componentes modernos** y accesibles
-- **Navegación intuitiva** y fluida
-
-## 🛠️ **Stack Tecnológico**
-
-### **Frontend**
-
-- **React 18** - Framework principal
-- **TypeScript** - Tipado estático y robusto
-- **Vite** - Build tool y dev server
-- **Tailwind CSS** - Framework de estilos utility-first
+- **Lovable** - Plataforma de desarrollo visual para la interfaz de usuario
+- **React 18** - Biblioteca de JavaScript para interfaces de usuario
+- **TypeScript** - Superset de JavaScript con tipado estático
+- **Vite** - Herramienta de construcción rápida para desarrollo web
+- **Tailwind CSS** - Framework CSS utility-first para diseño responsive
 - **Shadcn/ui** - Componentes de UI modernos y accesibles
+- **Lucide React** - Iconografía consistente y moderna
 
 ### **Backend & Base de Datos**
 
-- **Supabase** - Backend as a Service (BaaS)
-  - **PostgreSQL** - Base de datos relacional
-  - **Supabase Auth** - Sistema de autenticación
-  - **Supabase Storage** - Almacenamiento de archivos
-  - **Row Level Security (RLS)** - Seguridad a nivel de fila
-  - **Real-time subscriptions** - Actualizaciones en tiempo real
+- **Supabase** - Plataforma backend-as-a-service con PostgreSQL
+- **PostgreSQL** - Base de datos relacional robusta
+- **Row Level Security (RLS)** - Seguridad a nivel de fila implementada
+- **Edge Functions** - Funciones serverless para lógica de backend
+- **Storage** - Almacenamiento de archivos (CVs, avatares, logos)
 
-### **Herramientas de Desarrollo**
+### **Autenticación & Seguridad**
 
-- **Lovable** - Plataforma de desarrollo visual para interfaces web
-- **Cursor** - IDE inteligente con AI
-- **ESLint** - Linting de código
-- **Prettier** - Formateo automático
-- **PostCSS** - Procesamiento de CSS
-- **Autoprefixer** - Compatibilidad de navegadores
+- **Supabase Auth** - Sistema de autenticación completo
+- **JWT Tokens** - Autenticación basada en tokens
+- **Políticas RLS** - Control de acceso granular a datos
+- **Verificación de email** - Flujo de confirmación de correo
 
-### **Deployment & Hosting**
+### **Despliegue & Herramientas**
 
-- **Vercel** - Plataforma de deployment
+- **Vercel** - Plataforma de despliegue y hosting
+- **Cursor** - IDE potenciado por IA para desarrollo
 - **Git** - Control de versiones
-- **GitHub** - Repositorio remoto
+- **ESLint** - Linting de código JavaScript/TypeScript
+
+## 🏗️ **Arquitectura del Sistema**
+
+### **Estructura de Base de Datos**
+
+```sql
+-- Tablas principales
+developers     -- Perfiles de desarrolladores
+companies      -- Perfiles de empresas
+projects       -- Proyectos publicados
+connections    -- Conexiones entre usuarios
+applications   -- Aplicaciones a proyectos
+```
+
+### **Componentes Principales**
+
+- **Sistema de Autenticación** - Login/Registro con confirmación de email
+- **Gestión de Perfiles** - Perfiles editables para developers y empresas
+- **Sistema de Búsqueda** - Filtros avanzados por skills, sector, ubicación
+- **Sistema de Conexiones** - Botón "Conectar" que abre Gmail web
+- **Gestión de Archivos** - Upload de CVs (PDF) y avatares
+- **Interfaz Responsive** - Adaptable a desktop, tablet y mobile
+
+## ✨ **Características Principales**
+
+### **Para Developers**
+
+- ✅ Perfil completo con skills, experiencia, ubicación
+- ✅ Upload de CV en formato PDF
+- ✅ Enlaces a GitHub, LinkedIn, sitio web
+- ✅ Búsqueda de empresas y proyectos
+- ✅ Sistema de conexiones directas
+
+### **Para Empresas**
+
+- ✅ Perfil empresarial con sector y descripción
+- ✅ Publicación de proyectos y oportunidades
+- ✅ Búsqueda de talento por skills específicos
+- ✅ Sistema de conexiones con developers
+- ✅ Gestión de aplicaciones recibidas
+
+### **Funcionalidades Generales**
+
+- 🌙 **Modo Oscuro/Claro** - Toggle de tema
+- 📱 **Diseño Responsive** - Optimizado para todos los dispositivos
+- 🔍 **Búsqueda Inteligente** - Filtros y búsqueda en tiempo real
+- 🔐 **Seguridad Avanzada** - RLS y autenticación robusta
+- 📧 **Integración Email** - Apertura directa de Gmail web
 
 ## 🚀 **Instalación y Configuración**
 
@@ -101,28 +90,12 @@
 
 - Node.js 18+
 - npm o yarn
-- Cuenta en Supabase
-- Cuenta en Vercel (opcional)
-- **💡 Opcional**: Cuenta en [Lovable](https://lovable.dev) para desarrollo visual
-
-### **Alternativas de Desarrollo**
-
-#### **Opción 1: Desarrollo Local (Recomendado para desarrolladores)**
-
-Sigue los pasos de instalación estándar a continuación.
-
-#### **Opción 2: Desarrollo Visual con Lovable**
-
-1. **Visitar** [lovable.dev](https://lovable.dev)
-2. **Crear cuenta** gratuita
-3. **Importar proyecto** desde GitHub
-4. **Desarrollar visualmente** la interfaz
-5. **Exportar código** para deployment
+- Cuenta de Supabase
 
 ### **1. Clonar el Repositorio**
 
 ```bash
-git clone https://github.com/tu-usuario/connect-pieces.git
+git clone <repository-url>
 cd connect-pieces
 ```
 
@@ -130,13 +103,11 @@ cd connect-pieces
 
 ```bash
 npm install
-# o
-yarn install
 ```
 
 ### **3. Configurar Variables de Entorno**
 
-Crear archivo `.env.local` en la raíz del proyecto:
+Crear archivo `.env.local`:
 
 ```env
 VITE_SUPABASE_URL=tu_url_de_supabase
@@ -145,277 +116,161 @@ VITE_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
 
 ### **4. Configurar Supabase**
 
-1. **Crear proyecto** en [supabase.com](https://supabase.com)
-2. **Ejecutar scripts SQL** en el SQL Editor:
+```bash
+# Instalar CLI de Supabase
+npm install -g supabase
 
-   ```sql
-   -- Configurar base de datos
-   -- Archivo: supabase/schema.sql
-
-   -- Configurar storage para CVs
-   -- Archivo: supabase/storage-setup.sql
-
-   -- Configurar storage para avatares
-   -- Archivo: supabase/avatar-storage-setup.sql
-   ```
+# Login y link del proyecto
+npx supabase login
+npx supabase link --project-ref tu_project_ref
+```
 
 ### **5. Ejecutar en Desarrollo**
 
 ```bash
 npm run dev
-# o
-yarn dev
 ```
 
-### **6. Build para Producción**
+## 📱 **Uso de la Aplicación**
 
-```bash
-npm run build
-# o
-yarn build
-```
+### **Flujo de Usuario**
 
-## 🗄️ **Estructura de la Base de Datos**
+1. **Registro/Login** - Crear cuenta o iniciar sesión
+2. **Selección de Tipo** - Developer o Empresa
+3. **Completar Perfil** - Información personal/profesional
+4. **Explorar** - Buscar conexiones o proyectos
+5. **Conectar** - Usar botón "Conectar" para contactar
 
-### **Tablas Principales**
+### **Navegación Principal**
 
-- **`developers`** - Perfiles de desarrolladores
-- **`companies`** - Perfiles de empresas
-- **`projects`** - Proyectos de empresas
-- **`connections`** - Conexiones entre usuarios
-- **`applications`** - Aplicaciones a proyectos
-
-### **Características de Seguridad**
-
-- **UUIDs** como claves primarias
-- **RLS policies** para acceso controlado
-- **Foreign keys** con integridad referencial
-- **Índices optimizados** para búsquedas
-
-## 📱 **Componentes Principales**
-
-### **🔐 Autenticación**
-
-- **`AuthModal`** - Modal de login/registro
-- **`RegistrationFlowInfo`** - Flujo visual de registro
-- **`ChangeEmailModal`** - Cambio de email
-
-### **👤 Perfiles**
-
-- **`Profile`** - Página principal de perfil
-- **`AvatarUpload`** - Upload de avatares
-- **`FileUpload`** - Upload de CVs
-
-### **🎨 UI Components**
-
-- **Sistema de componentes** basado en Shadcn/ui
-- **Tema oscuro/claro** con ThemeProvider
-- **Toast notifications** para feedback
-- **Modales responsivos** y accesibles
-
-## 🌐 **Deployment en Vercel**
-
-### **Configuración Automática**
-
-1. **Conectar repositorio** de GitHub a Vercel
-2. **Configurar variables de entorno** en Vercel Dashboard
-3. **Deploy automático** en cada push a main
-
-### **Variables de Entorno en Vercel**
-
-```env
-VITE_SUPABASE_URL=tu_url_de_supabase
-VITE_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
-```
-
-### **Dominio Personalizado**
-
-- **Configurar DNS** en tu proveedor
-- **SSL automático** con Let's Encrypt
-- **CDN global** para mejor rendimiento
+- **Inicio** - Dashboard principal
+- **Developers** - Lista de desarrolladores
+- **Empresas** - Lista de empresas
+- **Proyectos** - Oportunidades disponibles
+- **Perfil** - Gestión de cuenta personal
 
 ## 🔧 **Configuración de Supabase**
 
-### **1. Habilitar Funcionalidades**
+### **Tablas y Políticas RLS**
 
-- ✅ **Authentication** - Sistema de usuarios
-- ✅ **Database** - Base de datos PostgreSQL
-- ✅ **Storage** - Almacenamiento de archivos
-- ✅ **Edge Functions** - Funciones serverless
+```sql
+-- Ejemplo de política RLS para developers
+CREATE POLICY "Users can view own profile" ON developers
+FOR SELECT USING (auth.uid() = id);
 
-### **2. Configurar Storage Buckets**
+CREATE POLICY "Users can update own profile" ON developers
+FOR UPDATE USING (auth.uid() = id);
+```
+
+### **Storage Buckets**
 
 ```sql
 -- Bucket para CVs
-INSERT INTO storage.buckets (id, name, public, file_size_limit)
-VALUES ('cv-files', 'cv-files', true, 5242880);
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('cv-storage', 'cv-storage', true);
 
 -- Bucket para avatares
-INSERT INTO storage.buckets (id, name, public, file_size_limit)
-VALUES ('avatars', 'avatars', true, 2097152);
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatar-storage', 'avatar-storage', true);
 ```
 
-### **3. Configurar RLS Policies**
+## 🎨 **Personalización y Estilos**
 
-- **Políticas de inserción** para perfiles propios
-- **Políticas de lectura** públicas para búsquedas
-- **Políticas de actualización** para propietarios
-- **Políticas de eliminación** con confirmación
+### **Tema y Colores**
 
-## 📱 **Responsive Design**
+- **Primary**: Azul personalizable
+- **Secondary**: Púrpura complementario
+- **Gradientes**: Transiciones suaves entre colores
+- **Modo Oscuro**: Tema automático con toggle manual
 
-### **Breakpoints**
+### **Componentes UI**
 
-- **Mobile**: < 640px
-- **Tablet**: 640px - 1024px
-- **Desktop**: > 1024px
+- **Cards** - Diseño de perfil y información
+- **Buttons** - Botones con estados y variantes
+- **Forms** - Formularios con validación
+- **Modals** - Ventanas emergentes para acciones
+- **Navigation** - Menú responsive y accesible
 
-### **Características**
+## 📊 **Rendimiento y Optimización**
 
-- **Grid system** adaptativo
-- **Flexbox layouts** responsivos
-- **Typography** escalable
-- **Spacing** consistente
+### **Técnicas Implementadas**
 
-## 🎨 **Sistema de Temas**
+- **Lazy Loading** - Carga diferida de componentes
+- **Memoización** - Uso de useMemo y useCallback
+- **Debouncing** - Optimización de búsquedas
+- **Rate Limiting** - Control de requests a APIs
+- **Caching** - Almacenamiento local de datos
 
-### **Tema Claro**
+### **Responsive Design**
 
-- **Colores suaves** y profesionales
-- **Contraste optimizado** para legibilidad
-- **Sombras sutiles** para profundidad
+- **Mobile First** - Diseño optimizado para móviles
+- **Breakpoints** - Adaptación a diferentes tamaños
+- **Touch Friendly** - Interacciones táctiles optimizadas
+- **Performance** - Carga rápida en todos los dispositivos
 
-### **Tema Oscuro**
+## 🚀 **Despliegue en Vercel**
 
-- **Colores oscuros** para descanso visual
-- **Acentos vibrantes** para elementos importantes
-- **Transiciones suaves** entre modos
+### **Configuración de Despliegue**
 
-## 🔒 **Seguridad**
+1. **Conectar Repositorio** - GitHub/GitLab con Vercel
+2. **Variables de Entorno** - Configurar en dashboard de Vercel
+3. **Build Settings** - Comando: `npm run build`
+4. **Output Directory** - `dist`
+5. **Deploy Automático** - Con cada push a main
 
-### **Autenticación**
+### **Optimizaciones de Producción**
 
-- **JWT tokens** seguros
-- **Refresh tokens** automáticos
-- **Sesiones persistentes** opcionales
+- **Code Splitting** - División automática de bundles
+- **Tree Shaking** - Eliminación de código no utilizado
+- **Minificación** - Compresión de CSS y JavaScript
+- **CDN** - Distribución global de contenido
 
-### **Autorización**
+## 🤝 **Contribución y Desarrollo**
 
-- **Row Level Security** en PostgreSQL
-- **Políticas granulares** por usuario
-- **Validación de entrada** en frontend y backend
+### **Estructura del Proyecto**
 
-### **Storage**
+```
+src/
+├── components/     # Componentes reutilizables
+├── pages/         # Páginas principales
+├── hooks/         # Hooks personalizados
+├── contexts/      # Contextos de React
+├── lib/           # Utilidades y configuraciones
+└── types/         # Definiciones de TypeScript
+```
 
-- **Archivos privados** por usuario
-- **Validación de tipos** de archivo
-- **Límites de tamaño** configurados
+### **Convenciones de Código**
 
-## 📊 **Performance**
+- **TypeScript** - Tipado estricto en todo el código
+- **ESLint** - Reglas de linting configuradas
+- **Prettier** - Formateo automático de código
+- **Componentes Funcionales** - Uso de hooks modernos
 
-### **Optimizaciones Frontend**
+## 📝 **Changelog**
 
-- **Code splitting** automático con Vite
-- **Lazy loading** de componentes
-- **Memoización** de cálculos costosos
-- **Debouncing** de búsquedas
+### **v1.0.0 - Lanzamiento Inicial**
 
-### **Optimizaciones Backend**
-
-- **Índices optimizados** en PostgreSQL
-- **Queries eficientes** con Supabase
-- **Caching** de datos frecuentes
-- **Compresión** de archivos
-
-## 🧪 **Testing**
-
-### **Tipos de Tests**
-
-- **Unit tests** para componentes
-- **Integration tests** para APIs
-- **E2E tests** para flujos completos
-
-### **Herramientas**
-
-- **Vitest** - Framework de testing
-- **React Testing Library** - Testing de componentes
-- **Playwright** - Testing E2E
-
-## 📈 **Monitoreo y Analytics**
-
-### **Métricas de Performance**
-
-- **Core Web Vitals** con Vercel Analytics
-- **Error tracking** automático
-- **Performance monitoring** en tiempo real
-
-### **Logs y Debugging**
-
-- **Console logging** estructurado
-- **Error boundaries** en React
-- **Stack traces** detallados
-
-## 🚀 **Roadmap**
-
-### **Fase 1 - Core Features** ✅
-
-- [x] Sistema de autenticación
-- [x] Gestión de perfiles
-- [x] Upload de archivos
-- [x] Interfaz responsive
-
-### **Fase 2 - Networking** 🔄
-
-- [ ] Sistema de conexiones
-- [ ] Chat en tiempo real
-- [ ] Notificaciones push
-- [ ] Sistema de recomendaciones
-
-### **Fase 3 - Advanced Features** 📋
-
-- [ ] Dashboard analítico
-- [ ] Sistema de pagos
-- [ ] API pública
-- [ ] Integraciones externas
-
-## 🤝 **Contribución**
-
-### **Guidelines**
-
-1. **Fork** el repositorio
-2. **Crea** una rama para tu feature
-3. **Commit** tus cambios
-4. **Push** a la rama
-5. **Abre** un Pull Request
-
-### **Estándares de Código**
-
-- **TypeScript** estricto
-- **ESLint** configurado
-- **Prettier** para formateo
-- **Conventional Commits** para mensajes
+- ✅ Sistema de autenticación completo
+- ✅ Perfiles de usuario editables
+- ✅ Sistema de conexiones
+- ✅ Interfaz responsive
+- ✅ Integración con Supabase
+- ✅ Modo oscuro/claro
+- ✅ Upload de archivos
+- ✅ Búsqueda y filtros
 
 ## 📄 **Licencia**
 
-Este proyecto está bajo la licencia **MIT**. Ver el archivo `LICENSE` para más detalles.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
 ## 🙏 **Agradecimientos**
 
-- **Lovable** por la excelente plataforma de desarrollo visual
-- **Supabase** por el excelente backend as a service
-- **Vercel** por la plataforma de deployment
-- **Shadcn/ui** por los componentes de UI
-- **Cursor** por el IDE inteligente
-- **Tailwind CSS** por el framework de estilos
-
-## 📞 **Contacto**
-
-- **GitHub**: [@tu-usuario](https://github.com/tu-usuario)
-- **Email**: tu-email@ejemplo.com
-- **LinkedIn**: [Tu Perfil](https://linkedin.com/in/tu-perfil)
+- **Lovable** por la plataforma de desarrollo visual
+- **Supabase** por el backend robusto y escalable
+- **Vercel** por el hosting y despliegue
+- **Cursor** por el IDE potenciado por IA
+- **Comunidad Open Source** por las librerías utilizadas
 
 ---
 
-**⭐ Si te gusta este proyecto, ¡dale una estrella en GitHub!**
-
-**🔄 Última actualización**: Diciembre 2024
+**Desarrollado con ❤️ usando tecnologías modernas para conectar talento tecnológico con oportunidades profesionales.**

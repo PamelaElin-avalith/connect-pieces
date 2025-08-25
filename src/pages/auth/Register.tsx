@@ -2,10 +2,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PuzzleCard, PuzzleCardContent, PuzzleCardHeader } from "@/components/ui/puzzle-card";
+import {
+  PuzzleCard,
+  PuzzleCardContent,
+  PuzzleCardHeader,
+} from "@/components/ui/puzzle-card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PuzzleIcon, User, Building, Mail, Lock, Github, Linkedin, Upload, FileText } from "lucide-react";
+import {
+  PuzzleIcon,
+  User,
+  Building,
+  Mail,
+  Lock,
+  Github,
+  Linkedin,
+  Upload,
+  FileText,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Register = () => {
@@ -19,25 +33,37 @@ export const Register = () => {
             <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-accent"></div>
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground">PuzzleConnect</h1>
-            <p className="text-sm text-muted-foreground">Crea tu perfil y conecta</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              ConnectPieces
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Crea tu perfil y conecta
+            </p>
           </div>
         </div>
 
         <PuzzleCard variant="connection" className="connection-pulse">
           <PuzzleCardHeader className="text-center space-y-2">
             <h2 className="text-2xl font-bold">Crear Cuenta</h2>
-            <p className="text-muted-foreground">Únete a la comunidad de conexiones profesionales</p>
+            <p className="text-muted-foreground">
+              Únete a la comunidad de conexiones profesionales
+            </p>
           </PuzzleCardHeader>
 
           <PuzzleCardContent>
             <Tabs defaultValue="developer" className="space-y-6">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="developer" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="developer"
+                  className="flex items-center gap-2"
+                >
                   <User className="h-4 w-4" />
                   Developer
                 </TabsTrigger>
-                <TabsTrigger value="company" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="company"
+                  className="flex items-center gap-2"
+                >
                   <Building className="h-4 w-4" />
                   Empresa
                 </TabsTrigger>
@@ -47,10 +73,7 @@ export const Register = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="dev-name">Nombre Completo</Label>
-                    <Input
-                      id="dev-name"
-                      placeholder="Juan Pérez"
-                    />
+                    <Input id="dev-name" placeholder="Juan Pérez" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="dev-email">Email</Label>
@@ -148,10 +171,7 @@ export const Register = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="company-name">Nombre de la Empresa</Label>
-                    <Input
-                      id="company-name"
-                      placeholder="TechCorp S.A."
-                    />
+                    <Input id="company-name" placeholder="TechCorp S.A." />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company-email">Email Corporativo</Label>
@@ -222,8 +242,8 @@ export const Register = () => {
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
                   ¿Ya tienes cuenta?{" "}
-                  <Link 
-                    to="/login" 
+                  <Link
+                    to="/login"
                     className="text-primary hover:underline font-medium"
                   >
                     Inicia sesión aquí

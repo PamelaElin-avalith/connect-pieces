@@ -22,7 +22,7 @@ const SUPABASE_CONFIG = {
   },
   global: {
     headers: {
-      'X-Client-Info': 'puzzleconnect-web',
+      'X-Client-Info': 'connectpieces-web',
     },
   },
 };
