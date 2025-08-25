@@ -10,10 +10,17 @@ import { Github, Linkedin, Mail, Search, Plus, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
 
+import { PublicProfileView } from "@/components/profile/PublicProfileView";
+
 export default function Developers() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [showProfileView, setShowProfileView] = useState(false);
+  const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(
+    null
+  );
   const { userType, isAuthenticated } = useNavigation();
   const navigate = useNavigate();
 
@@ -69,18 +76,22 @@ export default function Developers() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  const handleConnect = (developerId: string) => {
+  const handleConnect = (developer: Developer) => {
     if (!isAuthenticated) {
       // Mostrar modal de login
       return;
     }
-    // Lógica de conexión
-    console.log("Conectando con developer:", developerId);
+
+    // Abrir versión web de Gmail con destinatario precargado
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+      developer.email
+    )}`;
+    window.open(gmailUrl, "_blank");
   };
 
-  const handleViewProfile = (developerId: string) => {
-    // Navegar al perfil del developer
-    console.log("Ver perfil de developer:", developerId);
+  const handleViewProfile = (developer: Developer) => {
+    setSelectedDeveloper(developer);
+    setShowProfileView(true);
   };
 
   if (loading) {
@@ -250,7 +261,7 @@ export default function Developers() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => handleViewProfile(developer.id)}
+                      onClick={() => handleViewProfile(developer)}
                     >
                       Ver Perfil
                     </Button>
@@ -258,7 +269,7 @@ export default function Developers() {
                       <Button
                         size="sm"
                         className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-                        onClick={() => handleConnect(developer.id)}
+                        onClick={() => handleConnect(developer)}
                       >
                         Conectar
                       </Button>
@@ -270,6 +281,15 @@ export default function Developers() {
           </div>
         )}
       </div>
+
+      {/* Public Profile View */}
+      {showProfileView && selectedDeveloper && (
+        <PublicProfileView
+          profile={selectedDeveloper}
+          userType="developer"
+          onClose={() => setShowProfileView(false)}
+        />
+      )}
     </div>
   );
 }

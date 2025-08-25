@@ -143,28 +143,6 @@ export const Header = () => {
 
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
-                  {/* User Type Selector */}
-                  <div className="flex rounded-lg border bg-muted p-1">
-                    <Button
-                      variant={userType === "developer" ? "default" : "ghost"}
-                      size="sm"
-                      className="h-8 px-3"
-                      onClick={() => handleUserTypeSelect("developer")}
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      Developer
-                    </Button>
-                    <Button
-                      variant={userType === "company" ? "default" : "ghost"}
-                      size="sm"
-                      className="h-8 px-3"
-                      onClick={() => handleUserTypeSelect("company")}
-                    >
-                      <Building className="h-4 w-4 mr-2" />
-                      Empresa
-                    </Button>
-                  </div>
-
                   {/* Profile & Logout */}
                   <Button
                     variant="outline"
@@ -248,28 +226,6 @@ export const Header = () => {
               <div className="pt-4 border-t space-y-3">
                 {isAuthenticated ? (
                   <>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        variant={
-                          userType === "developer" ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={() => handleUserTypeSelect("developer")}
-                        className="h-11"
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        Developer
-                      </Button>
-                      <Button
-                        variant={userType === "company" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleUserTypeSelect("company")}
-                        className="h-11"
-                      >
-                        <Building className="h-4 w-4 mr-2" />
-                        Empresa
-                      </Button>
-                    </div>
                     <Button
                       variant="outline"
                       className="w-full h-11"

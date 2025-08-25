@@ -10,10 +10,14 @@ import { Building, Mail, Search, Plus, ArrowLeft, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
 
+import { PublicProfileView } from "@/components/profile/PublicProfileView";
+
 export default function Companies() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showProfileView, setShowProfileView] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const { userType, isAuthenticated } = useNavigation();
   const navigate = useNavigate();
 
@@ -69,18 +73,22 @@ export default function Companies() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  const handleConnect = (companyId: string) => {
+  const handleConnect = (company: Company) => {
     if (!isAuthenticated) {
       // Mostrar modal de login
       return;
     }
-    // Lógica de conexión
-    console.log("Conectando con empresa:", companyId);
+
+    // Abrir versión web de Gmail con destinatario precargado
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+      company.email
+    )}`;
+    window.open(gmailUrl, "_blank");
   };
 
-  const handleViewProfile = (companyId: string) => {
-    // Navegar al perfil de la empresa
-    console.log("Ver perfil de empresa:", companyId);
+  const handleViewProfile = (company: Company) => {
+    setSelectedCompany(company);
+    setShowProfileView(true);
   };
 
   if (loading) {
@@ -215,24 +223,11 @@ export default function Companies() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() =>
-                        window.open(`mailto:${company.email}`, "_blank")
-                      }
+                      onClick={() => handleConnect(company)}
                     >
                       <Mail className="h-4 w-4 mr-2" />
-                      Contactar
+                      Conectar
                     </Button>
-                    {company.website && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => window.open(company.website, "_blank")}
-                      >
-                        <Globe className="h-4 w-4 mr-2" />
-                        Sitio Web
-                      </Button>
-                    )}
                   </div>
 
                   {/* Actions */}
@@ -241,7 +236,7 @@ export default function Companies() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => handleViewProfile(company.id)}
+                      onClick={() => handleViewProfile(company)}
                     >
                       Ver Perfil
                     </Button>
@@ -249,7 +244,7 @@ export default function Companies() {
                       <Button
                         size="sm"
                         className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-                        onClick={() => handleConnect(company.id)}
+                        onClick={() => handleConnect(company)}
                       >
                         Conectar
                       </Button>
@@ -261,6 +256,15 @@ export default function Companies() {
           </div>
         )}
       </div>
+
+      {/* Public Profile View */}
+      {showProfileView && selectedCompany && (
+        <PublicProfileView
+          profile={selectedCompany}
+          userType="company"
+          onClose={() => setShowProfileView(false)}
+        />
+      )}
     </div>
   );
 }

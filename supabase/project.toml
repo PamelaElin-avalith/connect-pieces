@@ -1,0 +1,4 @@
+# Supabase Project Configuration
+project_id = "sjzcnmrcombonnwxybwn"
+api_url = "https://sjzcnmrcombonnwxybwn.supabase.co"
+db_url = "postgresql://postgres:WHw54nuiumJGW2CV@db.sjzcnmrcombonnwxybwn.supabase.co:5432/postgres"

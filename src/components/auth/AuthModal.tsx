@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileUpload } from "@/components/ui/file-upload";
+import { RegistrationFlowInfo } from "@/components/auth/RegistrationFlowInfo";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { supabase } from "@/lib/supabaseClient";
 import { StorageService } from "@/lib/storage";
@@ -55,6 +56,8 @@ export const AuthModal: React.FC = () => {
   });
 
   const [selectedCVFile, setSelectedCVFile] = useState<File | null>(null);
+  const [showRegistrationFlow, setShowRegistrationFlow] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string>("");
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -171,48 +174,24 @@ export const AuthModal: React.FC = () => {
           }
         }
 
-        // 4. Obtener el perfil creado
-        let profile;
-        if (selectedUserType === "developer") {
-          const { data: devProfile, error: fetchError } = await supabase
-            .from("developers")
-            .select("*")
-            .eq("id", authData.user.id)
-            .single();
-
-          if (fetchError) {
-            console.error("Error obteniendo perfil developer:", fetchError);
-          } else {
-            profile = devProfile;
-          }
-        } else {
-          const { data: compProfile, error: fetchError } = await supabase
-            .from("companies")
-            .select("*")
-            .eq("id", authData.user.id)
-            .single();
-
-          if (fetchError) {
-            console.error("Error obteniendo perfil company:", fetchError);
-          } else {
-            profile = compProfile;
-          }
-        }
-
-        // 5. Actualizar el estado de la aplicación
-        setUserType(selectedUserType);
-        setIsAuthenticated(true);
-        setCurrentUser({ ...authData.user, profile });
-
+        // 4. Mostrar mensaje de éxito y cambiar a login
         toast({
           title: "¡Registro exitoso!",
-          description: `Bienvenido a PuzzleConnect como ${
-            selectedUserType === "developer" ? "Developer" : "Empresa"
-          }`,
+          description: `Se ha enviado un email de confirmación a ${formData.email}. Por favor, confirma tu email antes de iniciar sesión.`,
         });
 
-        setShowAuthModal(false);
+        // 5. Mostrar flujo de registro y cambiar a login
+        setRegisteredEmail(formData.email);
+        setShowRegistrationFlow(true);
+        setAuthMode("login");
         resetForm();
+
+        // 6. Mostrar mensaje informativo en el login
+        toast({
+          title: "Email de confirmación enviado",
+          description:
+            "Revisa tu bandeja de entrada y spam. Una vez confirmado, podrás iniciar sesión.",
+        });
       } else {
         // Login
         const { data: authData, error: authError } =
@@ -304,11 +283,27 @@ export const AuthModal: React.FC = () => {
         errorMessage = "Error de autenticación. Verifica tus credenciales.";
       }
 
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      // Si es error de email no confirmado, mostrar botón de reenvío
+      if (errorMessage.includes("Email not confirmed")) {
+        toast({
+          title: "Email no confirmado",
+          description: errorMessage,
+          variant: "destructive",
+        });
+
+        // Mostrar botón de reenvío en el login
+        toast({
+          title: "¿No recibiste el email?",
+          description:
+            "Haz clic en 'Reenviar confirmación' para recibir un nuevo email.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -330,6 +325,8 @@ export const AuthModal: React.FC = () => {
     });
     setSelectedCVFile(null);
     setSelectedUserType("developer");
+    setShowRegistrationFlow(false);
+    setRegisteredEmail("");
   };
 
   const handleClose = () => {
@@ -338,6 +335,15 @@ export const AuthModal: React.FC = () => {
   };
 
   const handleResendConfirmation = async (email: string) => {
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Por favor, ingresa tu email primero",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.resend({
@@ -353,10 +359,24 @@ export const AuthModal: React.FC = () => {
           "Se ha reenviado el email de confirmación. Revisa tu bandeja de entrada y spam.",
       });
     } catch (error: unknown) {
+      console.error("Error reenviando email:", error);
+
+      let errorMessage = "Error al reenviar el email";
+      if (error instanceof Error) {
+        if (error.message.includes("rate limit")) {
+          errorMessage =
+            "Demasiados intentos. Espera unos minutos antes de intentar nuevamente.";
+        } else if (error.message.includes("User already confirmed")) {
+          errorMessage =
+            "Este usuario ya está confirmado. Puedes iniciar sesión directamente.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Error al reenviar el email",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -514,6 +534,22 @@ export const AuthModal: React.FC = () => {
                   >
                     ¿No recibiste el email de confirmación? Reenviar
                   </Button>
+                </div>
+
+                {/* Mostrar flujo de registro si es necesario */}
+                {showRegistrationFlow && (
+                  <RegistrationFlowInfo
+                    currentStep={2}
+                    email={registeredEmail}
+                  />
+                )}
+
+                {/* Mensaje informativo sobre confirmación */}
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                  <p className="text-xs text-blue-700 dark:text-blue-300 text-center">
+                    <strong>Importante:</strong> Después del registro, debes
+                    confirmar tu email antes de poder iniciar sesión.
+                  </p>
                 </div>
               </form>
             </TabsContent>
@@ -767,6 +803,15 @@ export const AuthModal: React.FC = () => {
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {loading ? "Creando cuenta..." : "Crear Cuenta"}
                 </Button>
+
+                {/* Mensaje informativo sobre el proceso */}
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                  <p className="text-xs text-blue-700 dark:text-blue-300 text-center">
+                    <strong>Proceso de registro:</strong>
+                    <br />
+                    1. Crear cuenta → 2. Confirmar email → 3. Iniciar sesión
+                  </p>
+                </div>
               </form>
             </TabsContent>
           </Tabs>

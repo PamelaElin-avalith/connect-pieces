@@ -355,7 +355,7 @@ export default function Profile() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="description">Descripción</Label>
+                      <Label htmlFor="description">Descripciónnn</Label>
                       {editing ? (
                         <Textarea
                           id="description"
@@ -387,152 +387,152 @@ export default function Profile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* LinkedIn - Disponible para ambos tipos de usuario */}
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin">LinkedIn</Label>
+                  {editing ? (
+                    <div className="relative">
+                      <Linkedin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="linkedin"
+                        placeholder="https://linkedin.com/in/username"
+                        value={formData.linkedin || ""}
+                        onChange={(e) =>
+                          handleInputChange("linkedin", e.target.value)
+                        }
+                        className="pl-10"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                      <Linkedin className="h-4 w-4 text-muted-foreground" />
+                      {profile.linkedin ? (
+                        <a
+                          href={profile.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          {profile.linkedin}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          No configurado
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sitio Web - Disponible para ambos tipos de usuario */}
+                <div className="space-y-2">
+                  <Label htmlFor="web_url">Sitio Web</Label>
+                  {editing ? (
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="web_url"
+                        type="url"
+                        placeholder="https://tu-sitio.com"
+                        value={formData.web_url || ""}
+                        onChange={(e) =>
+                          handleInputChange("web_url", e.target.value)
+                        }
+                        className="pl-10"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      {profile.web_url ? (
+                        <a
+                          href={profile.web_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          {profile.web_url}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          No configurado
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* GitHub - Solo para developers */}
                 {userType === "developer" && (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="github">GitHub</Label>
-                      {editing ? (
-                        <div className="relative">
-                          <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="github"
-                            placeholder="https://github.com/username"
-                            value={formData.github || ""}
-                            onChange={(e) =>
-                              handleInputChange("github", e.target.value)
-                            }
-                            className="pl-10"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
-                          <Github className="h-4 w-4 text-muted-foreground" />
-                          {profile.github ? (
-                            <a
-                              href={profile.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              {profile.github}
-                            </a>
-                          ) : (
-                            <span className="text-muted-foreground">
-                              No configurado
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="linkedin">LinkedIn</Label>
-                      {editing ? (
-                        <div className="relative">
-                          <Linkedin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="linkedin"
-                            placeholder="https://linkedin.com/in/username"
-                            value={formData.linkedin || ""}
-                            onChange={(e) =>
-                              handleInputChange("linkedin", e.target.value)
-                            }
-                            className="pl-10"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
-                          <Linkedin className="h-4 w-4 text-muted-foreground" />
-                          {profile.linkedin ? (
-                            <a
-                              href={profile.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              {profile.linkedin}
-                            </a>
-                          ) : (
-                            <span className="text-muted-foreground">
-                              No configurado
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Web URL */}
-                    <div className="space-y-2">
-                      <Label htmlFor="web_url">Sitio Web</Label>
-                      {editing ? (
-                        <div className="relative">
-                          <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="web_url"
-                            type="url"
-                            placeholder="https://tu-sitio.com"
-                            value={formData.web_url || ""}
-                            onChange={(e) =>
-                              handleInputChange("web_url", e.target.value)
-                            }
-                            className="pl-10"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
-                          <Globe className="h-4 w-4 text-muted-foreground" />
-                          {profile.web_url ? (
-                            <a
-                              href={profile.web_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              {profile.web_url}
-                            </a>
-                          ) : (
-                            <span className="text-muted-foreground">
-                              No configurado
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* CV Upload */}
-                    <div className="space-y-2">
-                      {editing ? (
-                        <FileUpload
-                          onFileSelect={(file) => {
-                            setSelectedCVFile(file);
-                          }}
-                          acceptedTypes={[".pdf"]}
-                          maxSize={5}
+                  <div className="space-y-2">
+                    <Label htmlFor="github">GitHub</Label>
+                    {editing ? (
+                      <div className="relative">
+                        <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="github"
+                          placeholder="https://github.com/username"
+                          value={formData.github || ""}
+                          onChange={(e) =>
+                            handleInputChange("github", e.target.value)
+                          }
+                          className="pl-10"
                         />
-                      ) : (
-                        <div className="space-y-2">
-                          <Label>CV</Label>
-                          <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            {profile.cv_url ? (
-                              <a
-                                href={profile.cv_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline"
-                              >
-                                Ver CV
-                              </a>
-                            ) : (
-                              <span className="text-muted-foreground">
-                                No configurado
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                        <Github className="h-4 w-4 text-muted-foreground" />
+                        {profile.github ? (
+                          <a
+                            href={profile.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            {profile.github}
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            No configurado
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* CV Upload - Solo para developers */}
+                {userType === "developer" && (
+                  <div className="space-y-2">
+                    <Label>CV</Label>
+                    {editing ? (
+                      <FileUpload
+                        onFileSelect={(file) => {
+                          setSelectedCVFile(file);
+                        }}
+                        acceptedTypes={[".pdf"]}
+                        maxSize={5}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        {profile.cv_url ? (
+                          <a
+                            href={profile.cv_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Ver CV
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            No configurado
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
               </CardContent>
             </Card>
