@@ -57,7 +57,7 @@ applications   -- Aplicaciones a proyectos
 
 - **Sistema de Autenticación** - Login/Registro con confirmación de email
 - **Gestión de Perfiles** - Perfiles editables para developers y empresas
-- **Sistema de Búsqueda** - Filtros avanzados por skills, sector, ubicación
+- **Sistema de Búsqueda** - Filtros avanzados por skills, sector, ubicación, tipo de desarrollador
 - **Sistema de Conexiones** - Botón "Conectar" que abre Gmail web
 - **Gestión de Archivos** - Upload de CVs (PDF) y avatares
 - **Interfaz Responsive** - Adaptable a desktop, tablet y mobile
@@ -67,16 +67,19 @@ applications   -- Aplicaciones a proyectos
 ### **Para Developers**
 
 - ✅ Perfil completo con skills, experiencia, ubicación
+- ✅ Campo "Acerca de" editable para información adicional
+- ✅ Especialidad de desarrollador (Frontend, Backend, Fullstack, UI/UX Designer, etc.)
 - ✅ Upload de CV en formato PDF
 - ✅ Enlaces a GitHub, LinkedIn, sitio web
-- ✅ Búsqueda de empresas y proyectos
+- ✅ Búsqueda avanzada con filtros por tipo de desarrollador y sector
 - ✅ Sistema de conexiones directas
 
 ### **Para Empresas**
 
 - ✅ Perfil empresarial con sector y descripción
+- ✅ Campo "Acerca de" editable para misión, visión y valores
 - ✅ Publicación de proyectos y oportunidades
-- ✅ Búsqueda de talento por skills específicos
+- ✅ Búsqueda de talento por skills específicos y tipo de desarrollador
 - ✅ Sistema de conexiones con developers
 - ✅ Gestión de aplicaciones recibidas
 

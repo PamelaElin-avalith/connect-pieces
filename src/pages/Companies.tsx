@@ -25,6 +25,7 @@ function CompaniesContent() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSector, setSelectedSector] = useState<string>("");
   const [showProfileView, setShowProfileView] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const { userType, isAuthenticated } = useNavigation();
@@ -58,20 +59,32 @@ function CompaniesContent() {
 
   // Memoizar companies filtrados para evitar recálculos innecesarios
   const filteredCompanies = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return companies;
+    let filtered = companies;
+
+    // Filtrar por sector
+    if (selectedSector) {
+      filtered = filtered.filter(
+        (company) => company.sector === selectedSector
+      );
     }
 
-    return companies.filter(
-      (company) =>
-        company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (company.sector &&
-          company.sector.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (company.description &&
-          company.description.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [companies, searchTerm]);
+    // Filtrar por término de búsqueda
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(
+        (company) =>
+          company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          company.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (company.sector &&
+            company.sector.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (company.description &&
+            company.description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    return filtered;
+  }, [companies, searchTerm, selectedSector]);
 
   // Debouncing para la búsqueda
   useEffect(() => {
@@ -146,15 +159,50 @@ function CompaniesContent() {
           )}
         </div>
 
-        {/* Search Bar */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nombre, sector o descripción..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 max-w-4xl">
+          {/* Search Bar */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nombre, sector o descripción..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Sector Filter */}
+          <div className="flex-1 max-w-xs">
+            <select
+              value={selectedSector}
+              onChange={(e) => setSelectedSector(e.target.value)}
+              className="w-full p-2 border rounded-md bg-background text-foreground"
+            >
+              <option value="">Todos los sectores</option>
+              {Array.from(
+                new Set(companies.map((c) => c.sector).filter(Boolean))
+              ).map((sector) => (
+                <option key={sector} value={sector}>
+                  {sector}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          {(searchTerm || selectedSector) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedSector("");
+              }}
+              className="px-4"
+            >
+              Limpiar Filtros
+            </Button>
+          )}
         </div>
 
         {/* Results Count */}

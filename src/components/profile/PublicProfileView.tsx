@@ -192,6 +192,20 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                           </div>
                         )}
 
+                        {userType === "developer" && profile.developer_type && (
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium text-muted-foreground">
+                              Especialidad
+                            </Label>
+                            <Badge
+                              variant="outline"
+                              className="text-blue-600 border-blue-200"
+                            >
+                              {profile.developer_type}
+                            </Badge>
+                          </div>
+                        )}
+
                         {profile.location && (
                           <div className="space-y-2">
                             <Label className="text-sm font-medium text-muted-foreground">
@@ -343,6 +357,20 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                           </Badge>
                         </div>
                       </div>
+
+                      {/* Campo "Acerca de" del usuario */}
+                      {profile.about && (
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-muted-foreground">
+                            Información Adicional
+                          </Label>
+                          <div className="p-4 bg-muted rounded-lg">
+                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                              {profile.about}
+                            </p>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="p-4 bg-muted rounded-lg">
                         <p className="text-sm text-muted-foreground">

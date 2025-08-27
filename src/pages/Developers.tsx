@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/lib/supabase-config";
 import { Developer } from "@/lib/supabaseClient";
+import { DEVELOPER_TYPES, DEVELOPER_TYPE_LABELS } from "@/types/developer";
 import {
   Github,
   Linkedin,
@@ -33,6 +34,7 @@ function DevelopersContent() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState<string>("");
 
   const [showProfileView, setShowProfileView] = useState(false);
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(
@@ -69,20 +71,30 @@ function DevelopersContent() {
 
   // Memoizar developers filtrados para evitar recálculos innecesarios
   const filteredDevelopers = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return developers;
+    let filtered = developers;
+
+    // Filtrar por tipo de desarrollador
+    if (selectedType) {
+      filtered = filtered.filter(
+        (developer) => developer.developer_type === selectedType
+      );
     }
 
-    return developers.filter(
-      (developer) =>
-        developer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        developer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (developer.skills &&
-          developer.skills.some((skill) =>
-            skill.toLowerCase().includes(searchTerm.toLowerCase())
-          ))
-    );
-  }, [developers, searchTerm]);
+    // Filtrar por término de búsqueda
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(
+        (developer) =>
+          developer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          developer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (developer.skills &&
+            developer.skills.some((skill) =>
+              skill.toLowerCase().includes(searchTerm.toLowerCase())
+            ))
+      );
+    }
+
+    return filtered;
+  }, [developers, searchTerm, selectedType]);
 
   // Debouncing para la búsqueda
   useEffect(() => {
@@ -157,15 +169,48 @@ function DevelopersContent() {
           )}
         </div>
 
-        {/* Search Bar */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nombre, email o skills..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 max-w-4xl">
+          {/* Search Bar */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nombre, email o skills..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Type Filter */}
+          <div className="flex-1 max-w-xs">
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="w-full p-2 border rounded-md bg-background text-foreground"
+            >
+              <option value="">Todos los tipos</option>
+              {DEVELOPER_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {DEVELOPER_TYPE_LABELS[type]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          {(searchTerm || selectedType) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedType("");
+              }}
+              className="px-4"
+            >
+              Limpiar Filtros
+            </Button>
+          )}
         </div>
 
         {/* Results Count */}
@@ -211,6 +256,14 @@ function DevelopersContent() {
                         <p className="text-sm text-muted-foreground">
                           {developer.email}
                         </p>
+                        {developer.developer_type && (
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                          >
+                            {developer.developer_type}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>

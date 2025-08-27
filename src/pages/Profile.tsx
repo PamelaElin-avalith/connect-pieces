@@ -33,6 +33,14 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { DEVELOPER_TYPES, DEVELOPER_TYPE_LABELS } from "@/types/developer";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -259,6 +267,17 @@ export default function Profile() {
                     )}
                   </div>
                 )}
+
+                {userType === "developer" && profile.developer_type && (
+                  <div className="flex justify-center md:justify-start">
+                    <Badge
+                      variant="secondary"
+                      className="text-blue-600 bg-blue-50 border-blue-200"
+                    >
+                      {profile.developer_type}
+                    </Badge>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -316,24 +335,68 @@ export default function Profile() {
                 </div>
 
                 {userType === "developer" ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="skills">Skills</Label>
-                    {editing ? (
-                      <Input
-                        id="skills"
-                        placeholder="React, TypeScript, Node.js"
-                        value={formData.skills?.join(", ") || ""}
-                        onChange={(e) => handleSkillsChange(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex flex-wrap gap-2 py-2">
-                        {profile.skills?.map((skill: string, index: number) => (
-                          <Badge key={index} variant="secondary">
-                            {skill}
-                          </Badge>
-                        )) || "No skills definidos"}
-                      </div>
-                    )}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="skills">Skills</Label>
+                      {editing ? (
+                        <Input
+                          id="skills"
+                          placeholder="React, TypeScript, Node.js"
+                          value={formData.skills?.join(", ") || ""}
+                          onChange={(e) => handleSkillsChange(e.target.value)}
+                        />
+                      ) : (
+                        <div className="flex flex-wrap gap-2 py-2">
+                          {profile.skills?.map(
+                            (skill: string, index: number) => (
+                              <Badge key={index} variant="secondary">
+                                {skill}
+                              </Badge>
+                            )
+                          ) || "No skills definidos"}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="developer_type">
+                        Tipo de Desarrollador
+                      </Label>
+                      {editing ? (
+                        <Select
+                          value={formData.developer_type || ""}
+                          onValueChange={(value) =>
+                            handleInputChange("developer_type", value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Seleccionar especialidad" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {DEVELOPER_TYPES.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {DEVELOPER_TYPE_LABELS[type]}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="flex items-center gap-2 py-2 px-3 bg-muted rounded-md">
+                          {profile.developer_type ? (
+                            <Badge
+                              variant="outline"
+                              className="text-blue-600 border-blue-200"
+                            >
+                              {profile.developer_type}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">
+                              No especificado
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -355,7 +418,7 @@ export default function Profile() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="description">Descripciónnn</Label>
+                      <Label htmlFor="description">Descripción</Label>
                       {editing ? (
                         <Textarea
                           id="description"
@@ -374,6 +437,31 @@ export default function Profile() {
                     </div>
                   </div>
                 )}
+
+                {/* Campo "Acerca de" para ambos tipos de usuario */}
+                <div className="space-y-2">
+                  <Label htmlFor="about">Acerca de</Label>
+                  {editing ? (
+                    <Textarea
+                      id="about"
+                      placeholder={
+                        userType === "developer"
+                          ? "Cuéntanos más sobre ti, tu experiencia, objetivos profesionales..."
+                          : "Cuéntanos más sobre tu empresa, misión, visión, valores..."
+                      }
+                      value={formData.about || ""}
+                      onChange={(e) =>
+                        handleInputChange("about", e.target.value)
+                      }
+                      rows={4}
+                      className="min-h-[100px]"
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-2 px-3 bg-muted rounded-md">
+                      {profile.about || "Sin información adicional"}
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

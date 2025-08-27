@@ -11,6 +11,10 @@ export interface Developer {
   name: string
   email: string
   skills: string[]
+  developer_type?: string | null
+  experience?: number | null
+  location?: string | null
+  about?: string | null
   github?: string | null
   linkedin?: string | null
   web_url?: string | null
