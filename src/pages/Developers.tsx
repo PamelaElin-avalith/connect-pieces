@@ -4,15 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase-config";
 import { Developer } from "@/lib/supabaseClient";
-import { Github, Linkedin, Mail, Search, Plus, ArrowLeft } from "lucide-react";
+import {
+  Github,
+  Linkedin,
+  Mail,
+  Search,
+  Plus,
+  ArrowLeft,
+  FileText,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
 
 import { PublicProfileView } from "@/components/profile/PublicProfileView";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function Developers() {
+  return (
+    <ProtectedRoute>
+      <DevelopersContent />
+    </ProtectedRoute>
+  );
+}
+
+function DevelopersContent() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -223,37 +240,55 @@ export default function Developers() {
                     </div>
                   )}
 
-                  {/* Social Links */}
-                  {(developer.github || developer.linkedin) && (
-                    <div className="flex gap-2">
-                      {developer.github && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() =>
-                            window.open(developer.github, "_blank")
-                          }
+                  {/* Social Links & CV */}
+                  <div className="space-y-3">
+                    {/* CV */}
+                    {developer.cv_url && (
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <a
+                          href={developer.cv_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-sm cursor-pointer"
                         >
-                          <Github className="h-4 w-4 mr-2" />
-                          GitHub
-                        </Button>
-                      )}
-                      {developer.linkedin && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() =>
-                            window.open(developer.linkedin, "_blank")
-                          }
-                        >
-                          <Linkedin className="h-4 w-4 mr-2" />
-                          LinkedIn
-                        </Button>
-                      )}
-                    </div>
-                  )}
+                          Ver CV
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Social Links */}
+                    {(developer.github || developer.linkedin) && (
+                      <div className="flex gap-2">
+                        {developer.github && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() =>
+                              window.open(developer.github, "_blank")
+                            }
+                          >
+                            <Github className="h-4 w-4 mr-2" />
+                            GitHub
+                          </Button>
+                        )}
+                        {developer.linkedin && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() =>
+                              window.open(developer.linkedin, "_blank")
+                            }
+                          >
+                            <Linkedin className="h-4 w-4 mr-2" />
+                            LinkedIn
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">

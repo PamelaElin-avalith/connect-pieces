@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 interface Project {
   id: number;
@@ -32,6 +33,14 @@ interface Project {
 }
 
 export default function Projects() {
+  return (
+    <ProtectedRoute>
+      <ProjectsContent />
+    </ProtectedRoute>
+  );
+}
+
+function ProjectsContent() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

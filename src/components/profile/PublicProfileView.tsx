@@ -282,12 +282,19 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                             <div className="flex items-center gap-2">
                               <FileText className="h-4 w-4 text-muted-foreground" />
                               {profile.cv_url ? (
-                                <Badge
-                                  variant="outline"
-                                  className="text-green-600"
+                                <a
+                                  href={profile.cv_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline cursor-pointer"
                                 >
-                                  Disponible
-                                </Badge>
+                                  <Badge
+                                    variant="outline"
+                                    className="text-green-600 hover:bg-green-50"
+                                  >
+                                    Ver CV
+                                  </Badge>
+                                </a>
                               ) : (
                                 <Badge
                                   variant="outline"

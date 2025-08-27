@@ -11,8 +11,17 @@ import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
 
 import { PublicProfileView } from "@/components/profile/PublicProfileView";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function Companies() {
+  return (
+    <ProtectedRoute>
+      <CompaniesContent />
+    </ProtectedRoute>
+  );
+}
+
+function CompaniesContent() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

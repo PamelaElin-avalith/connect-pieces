@@ -101,29 +101,31 @@ export const Header = () => {
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
-              {navigationItems.map((item) => (
-                <Button
-                  key={item.id}
-                  variant={isActiveTab(item.id) ? "default" : "ghost"}
-                  size="sm"
-                  className={cn(
-                    "transition-all duration-200",
-                    isActiveTab(item.id)
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "hover:bg-muted hover:text-foreground"
-                  )}
-                  onClick={() => {
-                    navigate(item.path);
-                    setActiveTab(item.id as any);
-                  }}
-                >
-                  <item.icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                </Button>
-              ))}
-            </nav>
+            {/* Desktop Navigation - Solo visible para usuarios autenticados */}
+            {isAuthenticated && (
+              <nav className="hidden lg:flex items-center gap-1">
+                {navigationItems.map((item) => (
+                  <Button
+                    key={item.id}
+                    variant={isActiveTab(item.id) ? "default" : "ghost"}
+                    size="sm"
+                    className={cn(
+                      "transition-all duration-200",
+                      isActiveTab(item.id)
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "hover:bg-muted hover:text-foreground"
+                    )}
+                    onClick={() => {
+                      navigate(item.path);
+                      setActiveTab(item.id as any);
+                    }}
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {item.label}
+                  </Button>
+                ))}
+              </nav>
+            )}
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-3">
@@ -205,22 +207,23 @@ export const Header = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t bg-background/95 backdrop-blur">
             <div className="container mx-auto px-3 sm:px-4 py-4 space-y-3">
-              {/* Mobile Navigation Items */}
-              {navigationItems.map((item) => (
-                <Button
-                  key={item.id}
-                  variant={isActiveTab(item.id) ? "default" : "ghost"}
-                  className="w-full justify-start h-12"
-                  onClick={() => {
-                    navigate(item.path);
-                    setActiveTab(item.id as any);
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <item.icon className="h-4 w-4 mr-3" />
-                  {item.label}
-                </Button>
-              ))}
+              {/* Mobile Navigation Items - Solo visible para usuarios autenticados */}
+              {isAuthenticated &&
+                navigationItems.map((item) => (
+                  <Button
+                    key={item.id}
+                    variant={isActiveTab(item.id) ? "default" : "ghost"}
+                    className="w-full justify-start h-12"
+                    onClick={() => {
+                      navigate(item.path);
+                      setActiveTab(item.id as any);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <item.icon className="h-4 w-4 mr-3" />
+                    {item.label}
+                  </Button>
+                ))}
 
               {/* Mobile Actions */}
               <div className="pt-4 border-t space-y-3">

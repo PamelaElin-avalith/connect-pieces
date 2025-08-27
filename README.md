@@ -28,6 +28,8 @@
 - **JWT Tokens** - Autenticación basada en tokens
 - **Políticas RLS** - Control de acceso granular a datos
 - **Verificación de email** - Flujo de confirmación de correo
+- **Rutas Protegidas** - Acceso restringido a secciones privadas (Developers, Empresas, Proyectos)
+- **Navbar Condicional** - Navegación principal solo visible para usuarios autenticados
 
 ### **Despliegue & Herramientas**
 
