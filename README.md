@@ -30,6 +30,8 @@
 - **Verificación de email** - Flujo de confirmación de correo
 - **Rutas Protegidas** - Acceso restringido a secciones privadas (Developers, Empresas, Proyectos)
 - **Navbar Condicional** - Navegación principal solo visible para usuarios autenticados
+- **Logout Completo** - Limpieza automática de tokens, estado local y localStorage
+- **Verificación de Sesión** - Control automático del estado de autenticación al recargar
 
 ### **Despliegue & Herramientas**
 

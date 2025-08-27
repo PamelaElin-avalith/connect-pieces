@@ -18,6 +18,7 @@ import { useTheme } from "@/components/ui/theme-provider";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase-config";
 
 export const Header = () => {
   const { theme, setTheme } = useTheme();
@@ -31,6 +32,7 @@ export const Header = () => {
     showAuthModal,
     setShowAuthModal,
     setAuthMode,
+    logout,
   } = useNavigation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,10 +42,8 @@ export const Header = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUserType(null);
-    setActiveTab("home");
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
     setMobileMenuOpen(false);
   };
