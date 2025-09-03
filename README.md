@@ -72,13 +72,14 @@ applications   -- Aplicaciones a proyectos
 - ✅ Upload de CV en formato PDF
 - ✅ Enlaces a GitHub, LinkedIn, sitio web
 - ✅ Búsqueda avanzada con filtros por tipo de desarrollador y sector
+- ✅ Creación de proyectos (disponible para developers y empresas)
 - ✅ Sistema de conexiones directas
 
 ### **Para Empresas**
 
 - ✅ Perfil empresarial con sector y descripción
 - ✅ Campo "Acerca de" editable para misión, visión y valores
-- ✅ Publicación de proyectos y oportunidades
+- ✅ Creación de proyectos (disponible para developers y empresas)
 - ✅ Búsqueda de talento por skills específicos y tipo de desarrollador
 - ✅ Sistema de conexiones con developers
 - ✅ Gestión de aplicaciones recibidas

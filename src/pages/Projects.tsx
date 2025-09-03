@@ -15,12 +15,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useNavigation } from "@/contexts/NavigationContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 
 interface Project {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  company_id: number;
+  company_id?: string;
+  developer_id?: string;
   skills_required: string[];
   budget_range: string;
   project_type: string;
@@ -29,6 +31,10 @@ interface Project {
   company?: {
     name: string;
     sector: string;
+  };
+  developer?: {
+    name: string;
+    developer_type: string;
   };
 }
 
@@ -45,12 +51,17 @@ function ProjectsContent() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-  const { userType, isAuthenticated } = useNavigation();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [applications, setApplications] = useState<any[]>([]);
+  const { userType, isAuthenticated, currentUser } = useNavigation();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+    if (userType === "developer" && currentUser?.id) {
+      fetchApplications();
+    }
+  }, [userType, currentUser]);
 
   useEffect(() => {
     filterProjects();
@@ -63,7 +74,8 @@ function ProjectsContent() {
         .select(
           `
           *,
-          company:companies(name, sector)
+          company:companies(name, sector),
+          developer:developers(name, developer_type)
         `
         )
         .order("created_at", { ascending: false });
@@ -77,6 +89,23 @@ function ProjectsContent() {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchApplications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("project_id, status")
+        .eq("developer_id", currentUser?.id);
+
+      if (error) {
+        console.error("Error fetching applications:", error);
+      } else {
+        setApplications(data || []);
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
@@ -102,7 +131,7 @@ function ProjectsContent() {
     setFilteredProjects(filtered);
   };
 
-  const handleApply = (projectId: number) => {
+  const handleApply = async (projectId: string) => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
@@ -113,8 +142,27 @@ function ProjectsContent() {
       return;
     }
 
-    // Aquí implementarías la lógica de aplicación
-    alert(`Aplicando al proyecto ${projectId}`);
+    try {
+      const { error } = await supabase.from("applications").insert({
+        project_id: projectId,
+        developer_id: currentUser?.id,
+        status: "pending",
+      });
+
+      if (error) throw error;
+
+      // Actualizar la lista de aplicaciones
+      await fetchApplications();
+
+      alert("¡Aplicación enviada exitosamente!");
+    } catch (error: any) {
+      console.error("Error applying to project:", error);
+      alert("Error al aplicar al proyecto: " + error.message);
+    }
+  };
+
+  const hasApplied = (projectId: string) => {
+    return applications.some((app) => app.project_id === projectId);
   };
 
   const handleCreateProject = () => {
@@ -123,13 +171,8 @@ function ProjectsContent() {
       return;
     }
 
-    if (userType !== "company") {
-      alert("Solo las empresas pueden crear proyectos");
-      return;
-    }
-
-    // Aquí podrías navegar a una página de creación de proyectos
-    alert("Funcionalidad de crear proyecto en desarrollo");
+    // Tanto developers como empresas pueden crear proyectos
+    setShowCreateModal(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -193,13 +236,13 @@ function ProjectsContent() {
             </div>
           </div>
 
-          {isAuthenticated && userType === "company" && (
+          {isAuthenticated && (
             <Button
               className="flex items-center gap-2"
               onClick={handleCreateProject}
             >
               <Plus className="h-4 w-4" />
-              Publicar Proyecto
+              {userType === "company" ? "Publicar Proyecto" : "Gestionar Proyectos"}
             </Button>
           )}
         </div>
@@ -234,10 +277,15 @@ function ProjectsContent() {
                   <CardTitle className="text-lg line-clamp-2">
                     {project.title}
                   </CardTitle>
-                  {project.company && (
+                  {(project.company || project.developer) && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Building className="h-4 w-4" />
-                      {project.company.name}
+                      {project.company?.name || project.developer?.name}
+                      {project.developer && (
+                        <Badge variant="outline" className="text-xs">
+                          {project.developer.developer_type}
+                        </Badge>
+                      )}
                     </div>
                   )}
                 </div>
@@ -294,15 +342,29 @@ function ProjectsContent() {
                     {project.status}
                   </Badge>
 
-                  <Button
-                    onClick={() => handleApply(project.id)}
-                    disabled={
-                      project.status !== "open" || userType !== "developer"
-                    }
-                    className="ml-auto"
-                  >
-                    {project.status === "open" ? "Aplicar" : "Cerrado"}
-                  </Button>
+                  {userType === "developer" && project.status === "open" ? (
+                    hasApplied(project.id) ? (
+                      <Badge
+                        variant="secondary"
+                        className="bg-green-100 text-green-800"
+                      >
+                        Aplicaste
+                      </Badge>
+                    ) : (
+                      <Button
+                        onClick={() => handleApply(project.id)}
+                        className="ml-auto"
+                      >
+                        Aplicar
+                      </Button>
+                    )
+                  ) : (
+                    <Button disabled className="ml-auto">
+                      {project.status === "open"
+                        ? "Solo Developers"
+                        : "Cerrado"}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -319,6 +381,12 @@ function ProjectsContent() {
           </div>
         )}
       </div>
+
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
     </div>
   );
 }

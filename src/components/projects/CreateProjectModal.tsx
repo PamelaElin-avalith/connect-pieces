@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,8 @@ import {
   Users,
   Loader2,
   Tag,
+  CheckCircle,
+  Building,
 } from "lucide-react";
 
 interface CreateProjectModalProps {
@@ -32,7 +34,9 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 }) => {
   const { userType, currentUser } = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"create" | "apply">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "applied">("create");
+  const [appliedProjects, setAppliedProjects] = useState<any[]>([]);
+  const [loadingApplied, setLoadingApplied] = useState(false);
 
   const [projectData, setProjectData] = useState({
     title: "",
@@ -50,6 +54,53 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
     setProjectData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Cargar proyectos aplicados cuando se abre la modal
+  useEffect(() => {
+    if (isOpen && userType === "developer" && currentUser?.id) {
+      fetchAppliedProjects();
+    }
+  }, [isOpen, userType, currentUser]);
+
+  const fetchAppliedProjects = async () => {
+    setLoadingApplied(true);
+    try {
+      const { data, error } = await supabase
+        .from("applications")
+        .select(
+          `
+          id,
+          status,
+          created_at,
+          project:projects(
+            id,
+            title,
+            description,
+            budget_range,
+            project_type,
+            status,
+            company:companies(name, sector),
+            developer:developers(name, developer_type)
+          )
+        `
+        )
+        .eq("developer_id", currentUser?.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setAppliedProjects(data || []);
+    } catch (error: any) {
+      console.error("Error fetching applied projects:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los proyectos aplicados",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingApplied(false);
+    }
+  };
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,22 +110,25 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
         throw new Error("Usuario no autenticado");
       }
 
-      const { error } = await supabase.from("projects").insert({
+      const projectInsert = {
         title: projectData.title,
         description: projectData.description,
-        skills: projectData.skills
+        skills_required: projectData.skills
           ? projectData.skills.split(",").map((s) => s.trim())
           : [],
-        budget: projectData.budget || null,
-        duration: projectData.duration || null,
-        location: projectData.location || null,
-        team_size: projectData.team_size || null,
-        type: projectData.type,
+        budget_range: projectData.budget || null,
+        project_type: projectData.type,
         status: projectData.status,
-        created_by: currentUser.id,
-        company_id: userType === "company" ? currentUser.id : null,
-        developer_id: userType === "developer" ? currentUser.id : null,
-      });
+      };
+
+      // Agregar el ID del creador según el tipo de usuario
+      if (userType === "company") {
+        projectInsert.company_id = currentUser.id;
+      } else {
+        projectInsert.developer_id = currentUser.id;
+      }
+
+      const { error } = await supabase.from("projects").insert(projectInsert);
 
       if (error) throw error;
 
@@ -146,9 +200,12 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 Crear Proyecto
               </TabsTrigger>
               {userType === "developer" && (
-                <TabsTrigger value="apply" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Aplicar a Proyectos
+                <TabsTrigger
+                  value="applied"
+                  className="flex items-center gap-2"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Proyectos Aplicados
                 </TabsTrigger>
               )}
             </TabsList>
@@ -336,22 +393,172 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             </TabsContent>
 
             {userType === "developer" && (
-              <TabsContent value="apply" className="space-y-6">
+              <TabsContent value="applied" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Briefcase className="h-5 w-5" />
-                      Proyectos Disponibles
+                      <CheckCircle className="h-5 w-5" />
+                      Proyectos Aplicados
                     </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Lista de proyectos a los que has aplicado
+                    </p>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground text-center py-8">
-                      Aquí verás los proyectos disponibles para aplicar.
-                      <br />
-                      <span className="text-sm">
-                        (Funcionalidad en desarrollo)
-                      </span>
-                    </p>
+                    {loadingApplied ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                        <span className="text-muted-foreground">
+                          Cargando proyectos...
+                        </span>
+                      </div>
+                    ) : appliedProjects.length === 0 ? (
+                      <div className="text-center py-8">
+                        <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">
+                          No has aplicado a ningún proyecto aún
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Ve a la sección de Proyectos para encontrar
+                          oportunidades
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {appliedProjects.map((application) => {
+                          const project = application.project;
+                          if (!project) return null;
+
+                          const getStatusColor = (status: string) => {
+                            switch (status) {
+                              case "pending":
+                                return "bg-yellow-100 text-yellow-800";
+                              case "reviewed":
+                                return "bg-blue-100 text-blue-800";
+                              case "accepted":
+                                return "bg-green-100 text-green-800";
+                              case "rejected":
+                                return "bg-red-100 text-red-800";
+                              default:
+                                return "bg-gray-100 text-gray-800";
+                            }
+                          };
+
+                          const getProjectStatusColor = (status: string) => {
+                            switch (status) {
+                              case "open":
+                                return "bg-green-100 text-green-800";
+                              case "in-progress":
+                                return "bg-blue-100 text-blue-800";
+                              case "completed":
+                                return "bg-gray-100 text-gray-800";
+                              case "cancelled":
+                                return "bg-red-100 text-red-800";
+                              default:
+                                return "bg-gray-100 text-gray-800";
+                            }
+                          };
+
+                          return (
+                            <Card
+                              key={application.id}
+                              className="border-l-4 border-l-primary"
+                            >
+                              <CardContent className="pt-4">
+                                <div className="space-y-3">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <h3 className="font-semibold text-lg">
+                                        {project.title}
+                                      </h3>
+                                      {(project.company ||
+                                        project.developer) && (
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                          <Building className="h-4 w-4" />
+                                          {project.company?.name ||
+                                            project.developer?.name}
+                                          {project.developer && (
+                                            <Badge
+                                              variant="outline"
+                                              className="text-xs"
+                                            >
+                                              {project.developer.developer_type}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-col gap-2 items-end">
+                                      <Badge
+                                        className={getStatusColor(
+                                          application.status
+                                        )}
+                                      >
+                                        {application.status === "pending" &&
+                                          "Pendiente"}
+                                        {application.status === "reviewed" &&
+                                          "Revisado"}
+                                        {application.status === "accepted" &&
+                                          "Aceptado"}
+                                        {application.status === "rejected" &&
+                                          "Rechazado"}
+                                      </Badge>
+                                      <Badge
+                                        className={getProjectStatusColor(
+                                          project.status
+                                        )}
+                                      >
+                                        {project.status}
+                                      </Badge>
+                                    </div>
+                                  </div>
+
+                                  {project.description && (
+                                    <p className="text-sm text-muted-foreground line-clamp-2">
+                                      {project.description}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-4">
+                                      {project.budget_range && (
+                                        <div className="flex items-center gap-1">
+                                          <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                          <span className="text-muted-foreground">
+                                            Presupuesto:
+                                          </span>
+                                          <span className="font-medium">
+                                            {project.budget_range}
+                                          </span>
+                                        </div>
+                                      )}
+                                      <div className="flex items-center gap-1">
+                                        <Clock className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-muted-foreground">
+                                          Tipo:
+                                        </span>
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                        >
+                                          {project.project_type}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      Aplicado:{" "}
+                                      {new Date(
+                                        application.created_at
+                                      ).toLocaleDateString()}
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

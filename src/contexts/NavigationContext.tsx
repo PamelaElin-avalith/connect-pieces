@@ -82,14 +82,19 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
             setIsAuthenticated(true);
             setCurrentUser(session.user);
           } else {
-            // No hay datos almacenados, limpiar sesión
-            await logout();
+            // Hay sesión pero no hay datos en localStorage, restaurar estado básico
+            setCurrentUser(session.user);
+            setIsAuthenticated(true);
+            // No establecer userType hasta que el usuario lo seleccione
           }
         } else {
           // No hay sesión activa, limpiar estado
           setUserType(null);
           setIsAuthenticated(false);
           setCurrentUser(null);
+          // Limpiar localStorage
+          localStorage.removeItem("userType");
+          localStorage.removeItem("isAuthenticated");
         }
       } catch (error) {
         console.error("Error durante verificación de sesión:", error);

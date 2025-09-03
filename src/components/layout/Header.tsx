@@ -53,6 +53,9 @@ export const Header = () => {
     setActiveTab(type === "developer" ? "developers" : "companies");
     navigate(type === "developer" ? "/developers" : "/companies");
     setMobileMenuOpen(false);
+
+    // Guardar en localStorage para persistir la selección
+    localStorage.setItem("userType", type);
   };
 
   const handleAuthClick = (mode: "login" | "register") => {

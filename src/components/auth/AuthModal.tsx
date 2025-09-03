@@ -245,6 +245,10 @@ export const AuthModal: React.FC = () => {
         setIsAuthenticated(true);
         setCurrentUser({ ...authData.user, profile });
 
+        // Guardar estado en localStorage para persistir la sesión
+        localStorage.setItem("userType", selectedUserType);
+        localStorage.setItem("isAuthenticated", "true");
+
         toast({
           title: "¡Bienvenido de vuelta!",
           description: `Has iniciado sesión como ${
